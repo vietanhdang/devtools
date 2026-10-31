@@ -1,0 +1,24 @@
+src/common/TMUtility.js
+  h_d74dcf9feaf970 472-499,509-511
+src/i18n/en/i18nUserSettings.js
+  h_d74dcf9feaf970 4
+src/i18n/vi/i18nUserSettings.js
+  h_d74dcf9feaf970 4
+src/views/misc/TMUserSettings.vue
+  h_d74dcf9feaf970 91-96,151-153,169-171,223,235,265-267,270-274,276-283,286,288,298-320,327,360,380-399
+src/views/tools/TMRemoteDesktopUltraViewer.vue
+  h_d74dcf9feaf970 829-834
+src_wasm/ultraviewer/src/wasm_glue.rs
+  h_d74dcf9feaf970 410-411,416-430,920,928-929,934-937
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "2f8eba9a009d75aa7a3721cf957f0a6382dc5800",
+  "prompts": {},
+  "humans": {
+    "h_d74dcf9feaf970": {
+      "author": "dvanh2 <dvanh2@rd.misa.com.vn>"
+    }
+  }
+}
