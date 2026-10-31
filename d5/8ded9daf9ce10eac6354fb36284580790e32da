@@ -1,0 +1,21 @@
+scripts/build-devtools-pi.ps1
+  s_76ecf3d218c76a::t_d38701d9a05f78 349-350,352-360,362
+scripts/build-devtools-server.ps1
+  s_76ecf3d218c76a::t_c0ff016a4fa357 352-353,355-363,365
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "d58ded9daf9ce10eac6354fb36284580790e32da",
+  "prompts": {},
+  "sessions": {
+    "s_76ecf3d218c76a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "84ef98c0-fc35-4da9-9782-c5716de07124",
+        "model": "unknown"
+      },
+      "human_author": "dvanh2 <dvanh2@rd.misa.com.vn>"
+    }
+  }
+}
