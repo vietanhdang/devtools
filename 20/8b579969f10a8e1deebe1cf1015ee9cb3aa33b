@@ -1,0 +1,21 @@
+src/views/tools/TMRemoteDesktopUltraViewer.vue
+  s_8b22e300c18a22::t_ed368510302cbe 961-962
+src_wasm/ultraviewer/src/session.rs
+  s_8b22e300c18a22::t_8c9497647279d1 1287-1292,1300,1302-1303,1331-1332,1339-1340
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "208b579969f10a8e1deebe1cf1015ee9cb3aa33b",
+  "prompts": {},
+  "sessions": {
+    "s_8b22e300c18a22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "719a17cf-6a2e-4e21-89d6-51466b0272c1",
+        "model": "unknown"
+      },
+      "human_author": "dvanh2 <dvanh2@rd.misa.com.vn>"
+    }
+  }
+}
