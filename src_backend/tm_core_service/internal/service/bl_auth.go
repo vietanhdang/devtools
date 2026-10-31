@@ -21,9 +21,12 @@ import (
 // InitDefaultAdmin tạo user admin/admin nếu bảng tm_auth_user trống.
 // Chỉ seed khi trống — không bao giờ đè mật khẩu đã đổi.
 func InitDefaultAdmin() {
-	db := database.GetConnectionDB()
+	db, err := database.GetConnectionDB()
+	if err != nil {
+		return
+	}
 	var count int
-	err := db.QueryRow("SELECT COUNT(*) FROM tm_auth_user").Scan(&count)
+	err = db.QueryRow("SELECT COUNT(*) FROM tm_auth_user").Scan(&count)
 	if err != nil || count > 0 {
 		return
 	}
@@ -67,9 +70,13 @@ func HandleAuthLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db := database.GetConnectionDB()
+	db, err := database.GetConnectionDB()
+	if err != nil {
+		authWriteJSON(w, map[string]interface{}{"success": false, "message": "Lỗi kết nối database"})
+		return
+	}
 	var id, hash string
-	err := db.QueryRow("SELECT id, password_hash FROM tm_auth_user WHERE username = ?", req.Username).Scan(&id, &hash)
+	err = db.QueryRow("SELECT id, password_hash FROM tm_auth_user WHERE username = ?", req.Username).Scan(&id, &hash)
 	if err != nil || bcrypt.CompareHashAndPassword([]byte(hash), []byte(req.Password)) != nil {
 		authWriteJSON(w, map[string]interface{}{"success": false, "message": "Sai tài khoản hoặc mật khẩu"})
 		return
@@ -116,9 +123,13 @@ func HandleAuthChangeCredentials(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db := database.GetConnectionDB()
+	db, err := database.GetConnectionDB()
+	if err != nil {
+		authWriteJSON(w, map[string]interface{}{"success": false, "message": "Lỗi kết nối database"})
+		return
+	}
 	var id, username, hash string
-	err := db.QueryRow("SELECT id, username, password_hash FROM tm_auth_user ORDER BY created_date LIMIT 1").Scan(&id, &username, &hash)
+	err = db.QueryRow("SELECT id, username, password_hash FROM tm_auth_user ORDER BY created_date LIMIT 1").Scan(&id, &username, &hash)
 	if err != nil {
 		authWriteJSON(w, map[string]interface{}{"success": false, "message": "Không tìm thấy user đăng nhập"})
 		return
