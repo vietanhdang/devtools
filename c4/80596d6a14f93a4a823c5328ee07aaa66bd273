@@ -1,0 +1,69 @@
+docs/development.md
+  s_76ecf3d218c76a::t_4c7c71f9ca0833 59-68,130-152
+scripts/build-devtools-pi.ps1
+  s_76ecf3d218c76a::t_48f8e3b24a8c35 349-356
+scripts/build-devtools-server.ps1
+  s_76ecf3d218c76a::t_f3466184b3b7c6 1-434
+scripts/docker/Dockerfile
+  s_76ecf3d218c76a::t_1abc7ed7a85551 1-19
+scripts/docker/docker-compose.yml
+  s_76ecf3d218c76a::t_a5294fa5f64f9e 1-18
+src/App.vue
+  s_76ecf3d218c76a::t_9bb43519d10864 24,33,38,48,85-88,97,100-116
+src/common/api/request/AgentAPI/TMAuthAPI.js
+  s_76ecf3d218c76a::t_b476b7badbb163 1-49
+src/common/api/request/TMBaseAPI.js
+  s_76ecf3d218c76a::t_9d58fedba276ff 2,90-94
+src/common/api/request/TMHttpClient.js
+  s_76ecf3d218c76a::t_863c3cf5ea86f7 11-17,36,63,91,119,145,170
+src/i18n/en/i18nCommon.js
+  s_76ecf3d218c76a::t_1c9e2e9ecabf12 35-57
+src/i18n/vi/i18nCommon.js
+  s_76ecf3d218c76a::t_cc309bbc2efe87 35-57
+src/stores/TMAppState.js
+  s_76ecf3d218c76a::t_82805103e66e3f 8-11
+src/views/misc/TMHeaderApp.vue
+  s_76ecf3d218c76a::t_9169a814c98e2f 27-34,97,705-715,763-772
+src/views/misc/TMLoginOverlay.vue
+  s_76ecf3d218c76a::t_e6e2a9738aacb6 1-113
+src/views/misc/TMUserSettings.vue
+  s_76ecf3d218c76a::t_ced27cc16b3992 91-135,147,149,158-164,207,217-276,328-330
+src_backend/tm_app/internal/common/tm_start_up.go
+  s_76ecf3d218c76a::t_10c10a5c6efc2c 12,21-22
+src_backend/tm_config/tm_center_config.go
+  s_76ecf3d218c76a::t_f23753c05c4519 23-24,48-53,112
+src_backend/tm_config/tm_config_global.go
+  s_76ecf3d218c76a::t_062fdc13ce3446 14-16,30,40-41,54-70
+src_backend/tm_core_service/external/api_app/tm_api_builder.go
+  s_76ecf3d218c76a::t_ac65576a15342b 33-35,48
+src_backend/tm_core_service/internal/auth/tm_session.go
+  s_76ecf3d218c76a::t_25efee697dbd02 1-73
+src_backend/tm_core_service/internal/database/migrations/0004_auth.sql
+  s_76ecf3d218c76a::t_8dc34bead5e6e8 1-13
+src_backend/tm_core_service/internal/middleware/tm_auth.go
+  s_76ecf3d218c76a::t_8f98d8dc38e4c3 1-50
+src_backend/tm_core_service/internal/middleware/tm_cors.go
+  s_76ecf3d218c76a::t_d7e4afc7b94384 7-10,13-22
+src_backend/tm_core_service/internal/model/tm_auth_user.go
+  s_76ecf3d218c76a::t_43c46145a085db 1-14
+src_backend/tm_core_service/internal/router/rt_auth.go
+  s_76ecf3d218c76a::t_7ede0768e4c751 1-16
+src_backend/tm_core_service/internal/service/bl_auth.go
+  s_76ecf3d218c76a::t_733ee20f8a4b2e 1-178
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "c480596d6a14f93a4a823c5328ee07aaa66bd273",
+  "prompts": {},
+  "sessions": {
+    "s_76ecf3d218c76a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "84ef98c0-fc35-4da9-9782-c5716de07124",
+        "model": "unknown"
+      },
+      "human_author": "dvanh2 <dvanh2@rd.misa.com.vn>"
+    }
+  }
+}
