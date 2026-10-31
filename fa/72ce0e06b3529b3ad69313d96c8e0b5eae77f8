@@ -1,0 +1,19 @@
+src_backend/tm_core_service/internal/service/bl_auth.go
+  s_76ecf3d218c76a::t_9a65c91eb7c718 24-27,29,73-77,79,126-130,132
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "fa72ce0e06b3529b3ad69313d96c8e0b5eae77f8",
+  "prompts": {},
+  "sessions": {
+    "s_76ecf3d218c76a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "84ef98c0-fc35-4da9-9782-c5716de07124",
+        "model": "unknown"
+      },
+      "human_author": "dvanh2 <dvanh2@rd.misa.com.vn>"
+    }
+  }
+}
