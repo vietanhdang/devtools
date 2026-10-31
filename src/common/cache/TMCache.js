@@ -4,6 +4,7 @@ import { TMCacheConfig } from "@/common/cache/TMCacheConfig.js";
 import { EnumCacheConfig } from "@/common/cache/TMEnumCacheConfig.js";
 import memoryStorage from "@/common/cache/driver/TMCacheInMemory.js";
 import indexDBStorage from "@/common/cache/driver/TMCacheIndexDB.js";
+import TMUserSettingAPI from "@/common/api/request/AgentAPI/TMUserSettingAPI.js";
 
 /* =======================
  * Web Crypto helpers
@@ -92,6 +93,71 @@ class TMCache {
     tmEnum.cacheType.inMemory,
   ];
 
+  // Sync cache localStorage xuống daemon: gộp các lần ghi liên tiếp (kéo
+  // layout phát sinh nhiều lần set) rồi đẩy 1 lần, mỗi key lấy giá trị mới nhất.
+  _remotePending = new Map();
+  _remoteTimer = null;
+  // Đang kéo dữ liệu từ daemon về — không đẩy ngược lại (tránh echo).
+  _remotePulling = false;
+
+  /**
+   * Xếp hàng đẩy 1 key localStorage xuống daemon (best-effort, daemon
+   * offline thì dữ liệu vẫn còn ở local, lần kết nối được sẽ tự đồng bộ).
+   */
+  _queueRemoteSet(formattedKey, value) {
+    this._remotePending.set(formattedKey, value);
+    if (this._remoteTimer) {
+      return;
+    }
+    this._remoteTimer = setTimeout(() => {
+      this._remoteTimer = null;
+      const entries = [...this._remotePending.entries()];
+      this._remotePending.clear();
+      const api = new TMUserSettingAPI();
+      for (const [key, val] of entries) {
+        api.saveKey(key, val).catch(() => {});
+      }
+    }, 1000);
+  }
+
+  /**
+   * Kéo toàn bộ setting đã lưu trên daemon về ghi đè lên cache local
+   * (server thắng — giống UserSettingsV2). Chạy lúc khởi động, sau khi đã
+   * biết agentURL. Key "UserSettingsV2" bỏ qua vì có luồng riêng
+   * (loadRemoteUserSettings giữ agentURL theo từng máy).
+   */
+  async applyRemoteCache() {
+    let data = null;
+    try {
+      const res = await new TMUserSettingAPI().getAll();
+      data = res?.data?.data;
+    } catch (e) {
+      // daemon không trả lời — dùng cache local như cũ
+      return;
+    }
+    if (!data || typeof data !== "object") {
+      return;
+    }
+    this._remotePulling = true;
+    try {
+      const userSettingsFormat = TMCacheConfig.UserSettings.KeyFormat;
+      for (const configKey of Object.keys(TMCacheConfig)) {
+        const config = TMCacheConfig[configKey];
+        if (config.CacheLevel !== tmEnum.cacheType.local) {
+          continue;
+        }
+        // Các key localStorage đều không có tham số {id} nên KeyFormat
+        // chính là tên key đã lưu trên daemon.
+        if (!(config.KeyFormat in data) || config.KeyFormat === userSettingsFormat) {
+          continue;
+        }
+        await this.set(EnumCacheConfig[configKey], data[config.KeyFormat]);
+      }
+    } finally {
+      this._remotePulling = false;
+    }
+  }
+
   getStorage(level) {
     switch (level) {
       case tmEnum.cacheType.session:
@@ -141,6 +207,16 @@ class TMCache {
       await storage.setItem(key, payload);
     } else {
       await storage.setItem(key, JSON.stringify(payload));
+    }
+
+    // Cache mức localStorage thì đẩy xuống daemon để đổi máy / xoá cache
+    // trình duyệt vẫn giữ nguyên cấu hình (trừ UserSettingsV2 có luồng riêng).
+    if (
+      !this._remotePulling &&
+      config.CacheLevel === tmEnum.cacheType.local &&
+      key !== TMCacheConfig.UserSettings.KeyFormat
+    ) {
+      this._queueRemoteSet(key, valueSave);
     }
   }
 

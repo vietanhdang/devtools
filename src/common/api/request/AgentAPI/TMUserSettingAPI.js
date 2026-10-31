@@ -22,6 +22,20 @@ class TMUserSettingAPI extends TMAgentAPI {
   async save(value) {
     return await this.post("/save", { value });
   }
+
+  /**
+   * Lấy map key → value của toàn bộ setting đã lưu trên daemon
+   */
+  async getAll() {
+    return await this.get("/get_all");
+  }
+
+  /**
+   * Lưu 1 setting theo key riêng (upsert theo key)
+   */
+  async saveKey(key, value) {
+    return await this.post("/save", { key, value });
+  }
 }
 
 export default TMUserSettingAPI;
