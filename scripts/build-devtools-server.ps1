@@ -349,13 +349,20 @@ if (Test-Path $webDist) { Remove-Item $webDist -Recurse -Force }
 New-Item -ItemType Directory -Force $webDist | Out-Null
 Copy-Item (Join-Path $RepoDir "dist\*") $webDist -Recurse -Force
 
-# ---------- 8. go mod tidy (keo x/crypto cho bcrypt) ----------
-Step "go mod tidy (tm_core_service)"
+# ---------- 8. Keo x/crypto cho bcrypt (pin ban tuong thich Go 1.25) ----------
+Step "go get x/crypto (tm_core_service)"
 Push-Location (Join-Path $RepoDir "src_backend\tm_core_service")
-go mod tidy
-$tidyExit = $LASTEXITCODE
+# x/crypto@latest yeu cau Go >= 1.26 — reset go directive + pin ban cu hon
+# de khong phai nang Go toolchain (repo dang chay Go 1.25).
+go mod edit -go=1.25.6
+go get golang.org/x/crypto@v0.36.0
+$depExit = $LASTEXITCODE
+if ($depExit -eq 0) {
+    go mod tidy
+    $depExit = $LASTEXITCODE
+}
 Pop-Location
-if ($tidyExit -ne 0) { Fail "go mod tidy that bai (kiem tra mang / GOPROXY)" }
+if ($depExit -ne 0) { Fail "go get/tidy x/crypto that bai (kiem tra mang / GOPROXY)" }
 
 # ---------- 9. Cross-compile linux/amd64 ----------
 Step "Cross-compile Go daemon cho amd64 (pure Go, khong CGO)"
