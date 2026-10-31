@@ -643,6 +643,9 @@ export default {
             `${me.$t("i18nCommon.ultraViewer.connected")} ${width}x${height}`,
             "success",
           );
+          // Tạm thời: chẩn đoán part 8 (monitor info) để đối chiếu định dạng
+          // host thật gửi. Xóa khi đã chắc chắn parser đúng.
+          me.addLog(client.init_debug(), "info");
           const canvas = me.$refs.uvCanvas;
           if (canvas) canvas.focus();
         });

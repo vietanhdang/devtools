@@ -161,6 +161,8 @@ pub struct Session {
     payload_bytes: u64,
     /// Các payload đã gửi tới máy đối tác (chẩn đoán).
     sent_payloads: Vec<String>,
+    /// Chẩn đoán lệnh init gần nhất: số parts + hex/text part 8 (monitor info).
+    init_debug: String,
     /// Con trỏ của máy đối tác (máy Windows không vẽ con trỏ vào khung hình
     /// mà gửi riêng lệnh 3/4/28 — viewer phải tự vẽ).
     cursor: CursorState,
@@ -252,6 +254,7 @@ impl Session {
             frames_applied: 0,
             payload_bytes: 0,
             sent_payloads: Vec::new(),
+            init_debug: String::new(),
             cursor: CursorState::default(),
             origin: (0, 0),
             monitors: Vec::new(),
@@ -291,6 +294,11 @@ impl Session {
     /// Các payload đã gửi tới máy đối tác (để chẩn đoán).
     pub fn sent_payloads(&self) -> &[String] {
         &self.sent_payloads
+    }
+
+    /// Chẩn đoán lệnh init gần nhất (số parts + part 8 thô).
+    pub fn init_debug(&self) -> &str {
+        &self.init_debug
     }
 
     /// Số màn hình của máy đối tác (0 = chưa có thông tin).
@@ -1064,6 +1072,16 @@ impl Session {
             self.fail(&format!("This UltraViewer version ({version}) is not supported yet."));
             return;
         }
+        // Chẩn đoán: ghi lại part 8 thô (hex + text) để đối chiếu định dạng
+        // monitor info mà host thật gửi (part 8 vắng mặt = chuỗi rỗng).
+        self.init_debug = format!(
+            "init: parts={} size={}x{} p8hex={} p8text=[{}]",
+            parts.len(),
+            init.width,
+            init.height,
+            parts.get(8).map(crate::wire::hex).unwrap_or_default(),
+            parts.get(8).map(|p| String::from_utf8_lossy(p)).unwrap_or_default(),
+        );
         // Màn hình khởi tạo đến qua kênh LAN trực tiếp → chuyển đường chính
         // sang kênh đó (độ trễ thấp hơn nhiều so với đi vòng relay).
         if source == PeerSource::Direct {

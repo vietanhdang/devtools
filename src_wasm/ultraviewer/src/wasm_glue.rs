@@ -470,6 +470,16 @@ impl UltraViewerClient {
             .unwrap_or_default()
     }
 
+    /// Chẩn đoán lệnh init gần nhất: số parts + part 8 thô (hex + text).
+    pub fn init_debug(&self) -> String {
+        self.state
+            .borrow()
+            .session
+            .as_ref()
+            .map(|s| s.init_debug().to_string())
+            .unwrap_or_default()
+    }
+
     /// Danh sách lệnh đã nhận từ máy đối tác (chẩn đoán).
     pub fn received_commands(&self) -> Vec<u8> {
         self.state
