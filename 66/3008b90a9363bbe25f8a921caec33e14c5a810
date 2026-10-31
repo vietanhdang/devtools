@@ -1,0 +1,27 @@
+src/common/TMAppStartup.js
+  s_8b22e300c18a22::t_5722c8e0ede869 3,23-26
+src/common/api/request/AgentAPI/TMUserSettingAPI.js
+  s_8b22e300c18a22::t_3880004c2c484f 25-38
+src/common/cache/TMCache.js
+  s_8b22e300c18a22::t_97b3d5836b44ff 7,96-160,211-220
+src_backend/tm_core_service/internal/router/rt_user_setting.go
+  s_8b22e300c18a22::t_2584ba24fe5bda 12
+src_backend/tm_core_service/internal/service/bl_user_setting.go
+  s_8b22e300c18a22::t_2bfd27da13aa4c 13-14,37-69,72,86-90,101
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "663008b90a9363bbe25f8a921caec33e14c5a810",
+  "prompts": {},
+  "sessions": {
+    "s_8b22e300c18a22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "719a17cf-6a2e-4e21-89d6-51466b0272c1",
+        "model": "unknown"
+      },
+      "human_author": "dvanh2 <dvanh2@rd.misa.com.vn>"
+    }
+  }
+}
