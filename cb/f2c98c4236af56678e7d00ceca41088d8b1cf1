@@ -1,0 +1,19 @@
+scripts/build-devtools-pi.ps1
+  s_4c5d930908288c::t_e4a297f77a7300 1-148
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "cbf2c98c4236af56678e7d00ceca41088d8b1cf1",
+  "prompts": {},
+  "sessions": {
+    "s_4c5d930908288c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ea11817c-0a06-4ec1-87a5-e579fc82ac99",
+        "model": "unknown"
+      },
+      "human_author": "dvanh2 <dvanh2@rd.misa.com.vn>"
+    }
+  }
+}
