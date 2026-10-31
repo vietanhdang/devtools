@@ -146,6 +146,12 @@ class TMCache {
         // Các key localStorage đều không có tham số {id} nên KeyFormat
         // chính là tên key đã lưu trên daemon.
         if (!(config.KeyFormat in data)) {
+          // Daemon chưa có mà local đã có (lần đầu bật đồng bộ) → đẩy lên
+          // luôn để máy khác khởi động kế tiếp nhận được.
+          const localValue = await this.get(EnumCacheConfig[configKey]);
+          if (localValue != null) {
+            this._queueRemoteSet(config.KeyFormat, localValue);
+          }
           continue;
         }
         await this.set(EnumCacheConfig[configKey], data[config.KeyFormat]);
