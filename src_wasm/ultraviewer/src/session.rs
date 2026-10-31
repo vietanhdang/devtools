@@ -1284,7 +1284,12 @@ impl Session {
 
     // ───────────────────────── nhập liệu từ người dùng ─────────────────────────
 
-    /// Chuột di chuyển (toạ độ pixel trên màn hình từ xa).
+    /// Chuột di chuyển.
+    ///
+    /// `x, y` là toạ độ trong ảnh màn hình từ xa (tầng JS đã cộng gốc của
+    /// vùng đang xem). Máy đối tác dùng toạ độ **desktop ảo** nên phải cộng
+    /// thêm gốc desktop ảo trước khi gửi — không cộng là click lệch đúng
+    /// bằng origin khi máy đối tác có màn nằm bên trái/trên màn chính.
     ///
     /// Chỉ lưu vị trí mới nhất; `flush_pointer` sẽ gửi theo nhịp giới hạn để
     /// không làm quá tải máy đối tác.
@@ -1292,9 +1297,10 @@ impl Session {
         if !self.can_send_input() {
             return;
         }
+        let (vx, vy) = (x + self.origin.0, y + self.origin.1);
         // Cập nhật vị trí con trỏ ngay lập tức để phản hồi mượt mà không trễ.
-        self.cursor.position = Some((x + self.origin.0, y + self.origin.1));
-        self.pending_pointer = Some((x, y));
+        self.cursor.position = Some((vx, vy));
+        self.pending_pointer = Some((vx, vy));
     }
 
     /// Gửi vị trí chuột đang chờ nếu đã đủ khoảng cách giữa 2 lần gửi.
@@ -1322,13 +1328,16 @@ impl Session {
     }
 
     /// Nhấn/thả chuột (0 = trái, 1 = phải, 2 = giữa).
+    /// `x, y` là toạ độ trong ảnh — cộng gốc desktop ảo trước khi gửi
+    /// (giống `on_pointer_move`).
     pub fn on_pointer_button(&mut self, button: u8, pressed: bool, x: i32, y: i32) {
         if !self.can_send_input() {
             return;
         }
         // Gửi vị trí đang chờ trước để thứ tự sự kiện trên máy đối tác đúng.
         self.flush_pointer_now();
-        for payload in self.encoder.pointer_button(button, pressed, Some((x, y))) {
+        let pos = Some((x + self.origin.0, y + self.origin.1));
+        for payload in self.encoder.pointer_button(button, pressed, pos) {
             self.send_peer(&payload);
         }
     }
