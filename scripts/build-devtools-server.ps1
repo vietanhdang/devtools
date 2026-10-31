@@ -364,6 +364,14 @@ if ($depExit -eq 0) {
 Pop-Location
 if ($depExit -ne 0) { Fail "go get/tidy x/crypto that bai (kiem tra mang / GOPROXY)" }
 
+# tm_app dung tm_core_service qua replace → go.sum cua tm_app cung can entry x/crypto
+Step "go mod tidy (tm_app)"
+Push-Location (Join-Path $RepoDir "src_backend\tm_app")
+go mod tidy
+$tidyAppExit = $LASTEXITCODE
+Pop-Location
+if ($tidyAppExit -ne 0) { Fail "go mod tidy tm_app that bai (kiem tra mang / GOPROXY)" }
+
 # ---------- 9. Cross-compile linux/amd64 ----------
 Step "Cross-compile Go daemon cho amd64 (pure Go, khong CGO)"
 $Version = node -p "require('./package.json').version"

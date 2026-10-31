@@ -9,7 +9,6 @@ import (
 	"tm_app/internal/banner"
 	"tm_config"
 	apiApp "tm_core_service/external/api_app"
-	"tm_core_service/internal/service"
 	"tm_core_service/tm_common"
 )
 
@@ -19,7 +18,7 @@ func HandleStartUpLogic() *tm_config.TMCenterConfig {
 	banner.PrintBanner()
 	apiApp.InitDatabase()
 	// Seed user admin/admin nếu bảng đăng nhập trống (không đè khi đã đổi)
-	service.InitDefaultAdmin()
+	apiApp.InitDefaultAdmin()
 
 	HandleGracefulShutdown()
 

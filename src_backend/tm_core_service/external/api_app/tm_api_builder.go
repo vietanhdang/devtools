@@ -15,6 +15,11 @@ func InitDatabase() {
 	database.InitDatabase()
 }
 
+// seed user admin/admin mặc định cho tính năng đăng nhập (bảng trống mới seed)
+func InitDefaultAdmin() {
+	service.InitDefaultAdmin()
+}
+
 // khởi chạy api app
 func RunAPIApp() {
 	port := tm_config.GetConfigGlobal().APIConfig.Port
