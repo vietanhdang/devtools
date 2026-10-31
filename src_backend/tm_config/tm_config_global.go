@@ -11,6 +11,9 @@ var (
 	// cấu hình config global static
 	configGlobal *TMCenterConfig
 	oneLock      sync.Once
+	// đường dẫn file config đã phát hiện (hoặc đã tạo mặc định)
+	configPath string
+	saveLock   sync.Mutex
 )
 
 // lấy ra cấu hình config
@@ -24,6 +27,7 @@ func GetConfigGlobal() *TMCenterConfig {
 			// Lấy đường dẫn file thực thi để đặt file config ngay bên cạnh
 			exePath, _ := os.Executable()
 			defaultPath := filepath.Join(filepath.Dir(exePath), "config.json")
+			configPath = defaultPath
 
 			// Ghi file mặc định
 			data, _ := json.MarshalIndent(currentConfig, "", "  ")
@@ -32,6 +36,8 @@ func GetConfigGlobal() *TMCenterConfig {
 			configGlobal = &currentConfig
 			return
 		}
+
+		configPath = path
 
 		// Trường hợp tìm thấy file: Đọc và Unmarshal như bình thường
 		data, err := os.ReadFile(path)
@@ -43,6 +49,23 @@ func GetConfigGlobal() *TMCenterConfig {
 	})
 
 	return configGlobal
+}
+
+// SaveConfigGlobal ghi lại config hiện tại vào file config đã phát hiện.
+// Dùng khi đổi setting runtime (vd bật/tắt login) để giữ lại sau restart.
+func SaveConfigGlobal() error {
+	saveLock.Lock()
+	defer saveLock.Unlock()
+
+	if configGlobal == nil || configPath == "" {
+		GetConfigGlobal()
+	}
+
+	data, err := json.MarshalIndent(configGlobal, "", "  ")
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(configPath, data, 0644)
 }
 
 func findConfigUpwards() (string, error) {

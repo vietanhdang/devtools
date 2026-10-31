@@ -20,6 +20,8 @@ type TMCenterConfig struct {
 	EndpointCaseSensitive bool `json:"endpoint_case_sensitive"`
 	// show địa chỉ ip server thay vì local host
 	ShowIPServer bool `json:"show_ip_server"`
+	// cấu hình đăng nhập (login) khi truy cập daemon
+	AuthConfig AuthConfig `json:"auth_config"`
 }
 
 type LogConfig struct {
@@ -41,6 +43,12 @@ type MockAPIConfig struct {
 	Port int `json:"port"`
 	// api mock không quan tâm tới body, chỉ cần trùng endpoint là được
 	EnableMockNotCareBody bool `json:"enable_mock_not_care_body"`
+}
+
+// AuthConfig bật/tắt màn hình đăng nhập khi truy cập daemon.
+// Tắt (mặc định) = mọi request không cần session.
+type AuthConfig struct {
+	Enable bool `json:"enable"`
 }
 
 // HTTPClientConfig cấu hình connection pool cho Go http.Client
@@ -101,5 +109,6 @@ func DefaultConfig() TMCenterConfig {
 		DatabaseName:          "dev_tool.db",
 		EndpointCaseSensitive: false,
 		ShowIPServer:          false,
+		AuthConfig:            AuthConfig{Enable: false},
 	}
 }

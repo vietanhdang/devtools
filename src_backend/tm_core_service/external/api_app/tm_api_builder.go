@@ -30,8 +30,9 @@ func RunAPIApp() {
 	// inject 1 số kịch bản chung toàn chương tình vào handler
 	var handler = tm_common.BuildHanlderAPICommon(app)
 
-	// Xâu chuỗi Middlewares: CORS -> Router
-	finalHandler := middleware.ApplyCORS(handler)
+	// Xâu chuỗi Middlewares: CORS (ngoài cùng) -> Auth -> Router.
+	// CORS ngoài cùng để response 401 của auth vẫn có header CORS.
+	finalHandler := middleware.ApplyAuth(middleware.ApplyCORS(handler))
 
 	addr := tm_common.BuildRunningAddressServer("Server Agent API", &port)
 
@@ -44,6 +45,7 @@ func RunAPIApp() {
 func addRoute(app *http.ServeMux) {
 	// Inject router cho từng nghiệp vụ
 	router.InjectCommonRouter(app)
+	router.InjectAuthRouter(app)
 	router.InjectAPITestingRouter(app)
 	router.InjectMockAPIRouter(app)
 	router.InjectFileOpsRouter(app)

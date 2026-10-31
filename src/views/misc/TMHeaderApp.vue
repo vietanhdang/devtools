@@ -24,6 +24,14 @@
     </div>
 
     <div class="tm-header-right">
+      <span
+        v-if="appState.isLoggedIn"
+        class="tm-header-logout"
+        v-tooltip="$t('i18nCommon.login.logout')"
+        @click="logoutFunc"
+      >
+        ⏻
+      </span>
       <span class="tm-header-version">{{ appVersion }}</span>
     </div>
 
@@ -86,6 +94,7 @@
 <script>
 import { useTabManager } from "@/stores/TMTabManager.js";
 import TMAgentAPI from "@/common/api/request/AgentAPI/TMAgentAPI.js";
+import TMAuthAPI from "@/common/api/request/AgentAPI/TMAuthAPI.js";
 import TMFlyoutPanel from "@/components/TMFlyoutPanel.vue";
 import { useFlyout } from "@/common/plugin/TMUseFlyout.js";
 import eventBus from "@/common/event/TMEventBus.js";
@@ -693,6 +702,17 @@ export default {
       this.$tmUtility.reloadApp();
       this.closeFlyout();
     },
+    /**
+     * Đăng xuất daemon — overlay login hiện lại (App.vue watch appState)
+     */
+    async logoutFunc() {
+      try {
+        await new TMAuthAPI().logout();
+      } catch (e) {
+        // Daemon không trả lời vẫn hiện lại màn login
+      }
+      appState.isLoggedIn = false;
+    },
   },
 };
 </script>
@@ -739,6 +759,16 @@ export default {
   .tm-header-version {
     font-size: var(--font-size-medium-rare);
     white-space: nowrap;
+  }
+
+  .tm-header-logout {
+    cursor: pointer;
+    font-size: var(--font-size-medium-rare);
+    opacity: 0.7;
+
+    &:hover {
+      opacity: 1;
+    }
   }
 }
 

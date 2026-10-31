@@ -56,7 +56,16 @@ Script chính thức:
 - Config: daemon tìm `config/config.json` hoặc `config.json` đi ngược từ thư mục exe; thiếu thì tự sinh file mặc định cạnh exe. File mẫu: `src_backend/tm_app/cmd/api_app/config.json`. `config.json` bị gitignore.
 - Port: API **7777**, Web UI **1403**, Mock API **8888**.
 - Database: `dev_tool.db` (SQLite, WAL) cạnh exe; migration idempotent tự chạy lúc khởi động.
-- CORS mở `*` để web-hosted + local daemon; path lowercased mặc định (`endpoint_case_sensitive: false`).
+- CORS: khi request có `Origin` thì echo đúng origin + `Allow-Credentials: true` (cần cho cookie session đăng nhập); không có `Origin` (curl/same-origin) thì `*`. Path lowercased mặc định (`endpoint_case_sensitive: false`).
+
+### 4b. Đăng nhập (login) khi truy cập daemon
+
+- Bật/tắt bằng `auth_config.enable` trong `config.json`, hoặc trực tiếp trong **Settings → "Đăng nhập & bảo mật"** (lưu ngay vào config, không cần restart).
+- Khi bật: mọi API + WebSocket (RDP, UltraViewer) yêu cầu cookie session `tm_session` (HttpOnly, SameSite=Lax, TTL 7 ngày). Session nằm trong memory daemon → restart daemon phải đăng nhập lại.
+- Tài khoản mặc định **admin / admin** (seed lúc khởi động khi bảng `tm_auth_user` trống, không bao giờ đè mật khẩu đã đổi). Đổi trong Settings.
+- Cookie **không có flag Secure** vì deploy HTTP trong LAN — nếu đặt TLS (reverse proxy) thì nên bật thêm.
+- Mock API (port 8888) là listener riêng, không đi qua auth.
+- Endpoint: `GET /auth/status`, `POST /auth/login|/logout|/change_credentials|/set_enabled` (response chuẩn `{success, message, data}`).
 
 ## 5. Build WASM (chỉ khi cần)
 
@@ -119,3 +128,25 @@ Deploy headless/CI: đặt `CLOUDFLARE_API_TOKEN` (quyền **Cloudflare Pages: E
 | `scripts/fetch_wasm_sources.sh` | Clone external repo về `src_wasm/*/external_repo/` (nếu chưa có) |
 | `scripts/git_pull_if_repo.sh` | Helper: pull repo nguồn, tự về nhánh mặc định nếu đang detached HEAD |
 | `scripts/deploy_cloudflare.sh` | Deploy thủ công Cloudflare Pages (build wasm + `REQUIRE_WASM=1 npm run build` → `wrangler pages deploy`) |
+| `scripts/build-devtools-pi.ps1` | Build daemon linux/arm64 cho Pi 4 từ Windows (wasm + FE + Go, tùy chọn scp) |
+| `scripts/build-devtools-server.ps1` | Build daemon linux/amd64 cho server Ubuntu từ Windows + đóng gói Docker (binary + Dockerfile + compose + `data/config.json` login bật sẵn) |
+
+## 9. Deploy server Ubuntu bằng Docker
+
+Trên máy Windows:
+
+```powershell
+.\scripts\build-devtools-server.ps1              # build + đóng gói vào out\dev-tool-docker\
+.\scripts\build-devtools-server.ps1 -ServerUser ubuntu -ServerIp <ip>   # build + scp luôn
+```
+
+Trên server (đã cài Docker):
+
+```bash
+cd ~/devtool-docker
+docker compose up -d --build
+```
+
+- Web UI: `http://<server-ip>:1403`, API: `http://<server-ip>:7777`.
+- Đăng nhập mặc định **admin / admin** — đổi ngay trong Settings sau khi vào (server public thì bắt buộc).
+- `data/` (mount vào `/app/config`) giữ `config.json` + `dev_tool.db` — persist qua các lần `docker compose up --build` lại. Nâng cấp: build binary mới, copy đè, chạy lại compose.

@@ -8,6 +8,13 @@ class TMHttpClient {
   static defaultHeaders = {
     "Content-Type": "application/json",
   };
+
+  // Gửi kèm cookie (credentials) — cần cho cookie session đăng nhập daemon.
+  // "include" vì FE (:1403) và API (:7777) khác port nên là cross-origin.
+  static defaultOptions = {
+    credentials: "include",
+  };
+
   /**
    * GET request
    * @param {string} url - API endpoint
@@ -26,6 +33,7 @@ class TMHttpClient {
     const fullUrl = url + queryString;
 
     const options = {
+      ...this.defaultOptions,
       method: "GET",
       headers: {
         ...this.defaultHeaders,
@@ -52,6 +60,7 @@ class TMHttpClient {
   static async post(url, data = {}, headers = {}, signal = null) {
     const isFormData = data instanceof FormData;
     const options = {
+      ...this.defaultOptions,
       method: "POST",
       headers: {
         ...(isFormData ? {} : this.defaultHeaders),
@@ -79,6 +88,7 @@ class TMHttpClient {
   static async put(url, data = {}, headers = {}, signal = null) {
     const isFormData = data instanceof FormData;
     const options = {
+      ...this.defaultOptions,
       method: "PUT",
       headers: {
         ...(isFormData ? {} : this.defaultHeaders),
@@ -106,6 +116,7 @@ class TMHttpClient {
   static async patch(url, data = {}, headers = {}, signal = null) {
     const isFormData = data instanceof FormData;
     const options = {
+      ...this.defaultOptions,
       method: "PATCH",
       headers: {
         ...(isFormData ? {} : this.defaultHeaders),
@@ -131,6 +142,7 @@ class TMHttpClient {
    */
   static async delete(url, headers = {}, signal = null) {
     const options = {
+      ...this.defaultOptions,
       method: "DELETE",
       headers: {
         ...this.defaultHeaders,
@@ -155,6 +167,7 @@ class TMHttpClient {
    */
   static async options(url, headers = {}, signal = null) {
     const options = {
+      ...this.defaultOptions,
       method: "OPTIONS",
       headers: {
         ...this.defaultHeaders,

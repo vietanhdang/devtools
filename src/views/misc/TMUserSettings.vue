@@ -88,6 +88,51 @@
           />
         </div>
       </div>
+      <div class="divide"></div>
+      <div class="flex flex-col setting-group">
+        <div class="user-setting-section-title">
+          {{ $t("i18nCommon.security.title") }}
+        </div>
+        <div class="flex user-setting-item">
+          <TMCheckbox
+            :variant="$tmEnum.checkboxType.switch"
+            v-model="securitySetting.enableLogin"
+            :label="$t('i18nCommon.security.enableLogin')"
+            :noMargin="true"
+          ></TMCheckbox>
+        </div>
+        <div class="flex user-setting-item">
+          <div>{{ $t("i18nCommon.security.currentPassword") }}</div>
+          <div class="input-setting">
+            <TMInput
+              v-model="securitySetting.currentPassword"
+              :inputType="'password'"
+              :noMargin="true"
+            />
+          </div>
+        </div>
+        <div class="flex user-setting-item">
+          <div>{{ $t("i18nCommon.security.newUsername") }}</div>
+          <div class="input-setting">
+            <TMInput v-model="securitySetting.newUsername" :noMargin="true" />
+          </div>
+        </div>
+        <div class="flex user-setting-item">
+          <div>{{ $t("i18nCommon.security.newPassword") }}</div>
+          <div class="input-setting">
+            <TMInput
+              v-model="securitySetting.newPassword"
+              :inputType="'password'"
+              :noMargin="true"
+            />
+          </div>
+        </div>
+        <TMButton
+          :noMargin="true"
+          @click="applySecuritySetting"
+          :label="$t('i18nCommon.security.apply')"
+        />
+      </div>
     </div>
     <TMButton
       :noMargin="true"
@@ -99,7 +144,9 @@
 <script>
 import TMAutomation from "@/common/automation/TMAutomation.js";
 import TMAgentAPI from "@/common/api/request/AgentAPI/TMAgentAPI.js";
+import TMAuthAPI from "@/common/api/request/AgentAPI/TMAuthAPI.js";
 import { getUserSettingDefault } from "@/common/TMUserSettingDefault.js";
+import { appState } from "@/stores/TMAppState.js";
 
 export default {
   name: "TMUserSettings",
@@ -108,6 +155,13 @@ export default {
     let me = this;
     return {
       currentUserSetting: getUserSettingDefault(),
+      // Setting đăng nhập lưu ở DAEMON (config + db), không phải cache client
+      securitySetting: {
+        enableLogin: false,
+        currentPassword: "",
+        newUsername: "",
+        newPassword: "",
+      },
       themeOption: me.$tmEnum.monacoThemeList,
       languageOption: [
         { value: "vi", label: me.$t("i18nGlobal.language.vi") },
@@ -150,6 +204,7 @@ export default {
   created() {
     let me = this;
     me.processWhenCreated();
+    me.processSecurityWhenCreated();
   },
   methods: {
     async processWhenCreated() {
@@ -157,6 +212,66 @@ export default {
       let cacheData = await me.$tmUtility.getUserSettings();
       if (cacheData) {
         me.currentUserSetting = Object.assign(me.currentUserSetting, cacheData);
+      }
+    },
+    /**
+     * Trạng thái đăng nhập lấy từ daemon (config server), không phải cache client
+     */
+    async processSecurityWhenCreated() {
+      let me = this;
+      try {
+        const res = await new TMAuthAPI().status();
+        const data = res?.data?.data;
+        if (data) {
+          me.securitySetting.enableLogin = !!data.enabled;
+        }
+      } catch (e) {
+        // Daemon không trả lời — giữ mặc định tắt
+      }
+    },
+    /**
+     * Áp dụng setting đăng nhập: bật/tắt + đổi thông tin đăng nhập (nếu điền)
+     */
+    async applySecuritySetting() {
+      let me = this;
+      let hasCredentials =
+        me.securitySetting.currentPassword &&
+        (me.securitySetting.newUsername || me.securitySetting.newPassword);
+
+      try {
+        if (hasCredentials) {
+          const credRes = await new TMAuthAPI().changeCredentials(
+            me.securitySetting.currentPassword,
+            me.securitySetting.newUsername,
+            me.securitySetting.newPassword,
+          );
+          if (!credRes?.data?.success) {
+            me.$tmToast.error(
+              credRes?.data?.message ||
+                me.$t("i18nCommon.security.settingSaveFailed"),
+            );
+            return;
+          }
+          me.$tmToast.success(me.$t("i18nCommon.security.credentialsChanged"));
+        }
+
+        const enableRes = await new TMAuthAPI().setEnabled(
+          me.securitySetting.enableLogin,
+        );
+        if (!enableRes?.data?.success) {
+          me.$tmToast.error(
+            enableRes?.data?.message ||
+              me.$t("i18nCommon.security.settingSaveFailed"),
+          );
+          return;
+        }
+        me.$tmToast.success(me.$t("i18nCommon.security.settingSaved"));
+
+        // Đồng bộ lại trạng thái gate login rồi reload cho sạch
+        appState.authRequired = me.securitySetting.enableLogin;
+        me.$tmUtility.reloadApp();
+      } catch (e) {
+        me.$tmToast.error(me.$t("i18nCommon.security.settingSaveFailed"));
       }
     },
     async saveSetting() {
@@ -210,6 +325,9 @@ export default {
       height: 100%;
       gap: var(--padding);
       justify-content: flex-start;
+      .user-setting-section-title {
+        font-weight: bold;
+      }
       .user-setting-item {
         width: 100%;
         justify-content: space-between;

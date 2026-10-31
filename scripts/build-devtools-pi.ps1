@@ -346,6 +346,14 @@ if (Test-Path $webDist) { Remove-Item $webDist -Recurse -Force }
 New-Item -ItemType Directory -Force $webDist | Out-Null
 Copy-Item (Join-Path $RepoDir "dist\*") $webDist -Recurse -Force
 
+# ---------- 8. go mod tidy (keo x/crypto cho bcrypt) ----------
+Step "go mod tidy (tm_core_service)"
+Push-Location (Join-Path $RepoDir "src_backend\tm_core_service")
+go mod tidy
+$tidyExit = $LASTEXITCODE
+Pop-Location
+if ($tidyExit -ne 0) { Fail "go mod tidy that bai (kiem tra mang / GOPROXY)" }
+
 # ---------- 11. Cross-compile linux/arm64 ----------
 Step "Cross-compile Go daemon cho arm64 (pure Go, khong CGO)"
 $oldGoos, $oldGoarch, $oldCgo = $env:GOOS, $env:GOARCH, $env:CGO_ENABLED

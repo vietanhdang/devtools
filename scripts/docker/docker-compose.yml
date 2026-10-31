@@ -1,0 +1,18 @@
+# Chạy daemon devtools trên server Ubuntu.
+# Copy nội dung out/dev-tool-docker/ (binary + Dockerfile + compose + data/)
+# lên server rồi chạy: docker compose up -d --build
+services:
+  devtools:
+    build: .
+    container_name: devtools
+    ports:
+      # Web UI / API testing
+      - "1403:1403"
+      # API + WebSocket (RDP, UltraViewer)
+      - "7777:7777"
+    volumes:
+      # config.json + dev_tool.db persist ngoài container.
+      # Daemon tìm config tại <thư mục exe>/config/config.json và
+      # lưu db theo database_name trong config (config/dev_tool.db).
+      - ./data:/app/config
+    restart: unless-stopped

@@ -21,6 +21,7 @@
       <TMFooterApp />
     </div>
     <TMDynamicCursorEffect />
+    <TMLoginOverlay v-if="showLoginOverlay" />
   </div>
 </template>
 
@@ -29,10 +30,12 @@ import TMHeaderApp from "@/views/misc/TMHeaderApp.vue";
 import TMFooterApp from "@/views/misc/TMFooterApp.vue";
 import TMSidebar from "@/views/misc/TMSidebar.vue";
 import TMDynamicTabView from "@/views/misc/TMDynamicTabView.vue";
+import TMLoginOverlay from "@/views/misc/TMLoginOverlay.vue";
 import TMDialogUtil, { TMDialogEnum } from "@/common/TMDialogUtil.js";
 import "@/common/TMPrototype.js";
 import TMAppStartup from "@/common/TMAppStartup.js";
 import TMDynamicCursorEffect from "@/views/cursorEffect/TMDynamicCursorEffect.vue";
+import TMAuthAPI from "@/common/api/request/AgentAPI/TMAuthAPI.js";
 import { appState } from "@/stores/TMAppState.js";
 
 export default {
@@ -42,6 +45,7 @@ export default {
     TMSidebar,
     TMDynamicTabView,
     TMDynamicCursorEffect,
+    TMLoginOverlay,
   },
   created() {
     let me = this;
@@ -78,6 +82,10 @@ export default {
     showSideBarRight() {
       return appState.sideBarMenuPosition === this.enumPosition.Right;
     },
+    // Daemon bật login và chưa đăng nhập → che toàn bộ app bằng overlay
+    showLoginOverlay() {
+      return appState.authRequired && !appState.isLoggedIn;
+    },
   },
   methods: {
     /**
@@ -86,7 +94,25 @@ export default {
     async processWhenRunApp() {
       let me = this;
       await TMAppStartup.initialize();
+      await me.checkAuthStatus();
       await me.showAgreementIfNotAccepted();
+    },
+    /**
+     * Hỏi daemon có yêu cầu đăng nhập không (cookie session còn hạn thì
+     * coi như đã đăng nhập). Daemon không trả lời thì bỏ qua — giữ nguyên
+     * hành vi offline như cũ.
+     */
+    async checkAuthStatus() {
+      try {
+        const res = await new TMAuthAPI().status();
+        const data = res?.data?.data;
+        if (data?.enabled) {
+          appState.authRequired = true;
+          appState.isLoggedIn = !!data.logged_in;
+        }
+      } catch (e) {
+        // Daemon không chạy / không trả lời — không chặn app
+      }
     },
     /**
      * Điều khoản sử dụng chỉ hiện 1 lần duy nhất: đóng popup xong thì lưu cờ

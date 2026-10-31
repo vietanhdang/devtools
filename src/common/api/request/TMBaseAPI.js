@@ -1,4 +1,5 @@
 import TMHttpClient from "@/common/api/request/TMHttpClient.js";
+import { appState } from "@/stores/TMAppState.js";
 
 /**
  * TMBaseAPI - Base API class với hàm request chung
@@ -86,6 +87,11 @@ class TMBaseAPI {
 
       // Kiểm tra response status
       if (!response.ok) {
+        // Session hết hạn → hiện lại màn hình đăng nhập (App.vue watch appState)
+        if (response.status === 401) {
+          appState.isLoggedIn = false;
+        }
+
         // Thử parse error response
         let errorData;
         const contentType = response.headers.get("content-type");
