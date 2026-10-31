@@ -2,14 +2,15 @@
 # Cach chay:
 #   .\build-devtools-pi.ps1                          # build, khong chep sang Pi
 #   .\build-devtools-pi.ps1 -PiUser ubuntu -PiIp 192.168.1.50   # build + scp sang Pi
-# Yeu cau truoc khi chay: Node 22+, Go 1.25+, git, .NET SDK 10, Python 3.
-# Rust/wasm-pack/trunk thieu thi script tu cai.
-# Build day du 5 module wasm (nhu scripts/build_wasm.sh):
-#   ultraviewer, iron_rdp (rdp), dotnet_wrapper, cimbar (prebuilt), photocraft.
+# Yeu cau truoc khi chay: Node 22+, Go 1.25+, git, Python 3. Rust/wasm-pack/trunk thieu thi script tu cai.
+# Build wasm nhu scripts/build_wasm.sh: ultraviewer, iron_rdp (rdp), cimbar (prebuilt), photocraft.
+# dotnet_wrapper chi build khi co -WithDotnet (can .NET SDK 10).
 
 param(
     [string]$PiUser = "pi",
-    [string]$PiIp = ""
+    [string]$PiIp = "",
+    # Tam thoi bo qua build dotnet_wrapper (can .NET SDK 10). Them -WithDotnet de build lai.
+    [switch]$WithDotnet
 )
 
 $ErrorActionPreference = "Stop"
@@ -56,9 +57,11 @@ if ([version]$goVer -lt [version]"1.25") { Fail "Go qua cu ($goVer), can 1.25+" 
 
 if (-not (Get-Command git -ErrorAction SilentlyContinue)) { Fail "Thieu git. Tai: https://git-scm.com" }
 
-if (-not (Get-Command dotnet -ErrorAction SilentlyContinue)) { Fail "Thieu .NET SDK. Tai: https://dotnet.microsoft.com/download/dotnet/10.0" }
-$sdks = dotnet --list-sdks 2>$null
-if (-not ($sdks | Where-Object { $_ -match '^10\.' })) { Fail "Thieu .NET SDK 10 (can cho dotnet_wrapper). Tai: https://dotnet.microsoft.com/download/dotnet/10.0" }
+if ($WithDotnet) {
+    if (-not (Get-Command dotnet -ErrorAction SilentlyContinue)) { Fail "Thieu .NET SDK. Tai: https://dotnet.microsoft.com/download/dotnet/10.0" }
+    $sdks = dotnet --list-sdks 2>$null
+    if (-not ($sdks | Where-Object { $_ -match '^10\.' })) { Fail "Thieu .NET SDK 10 (can cho dotnet_wrapper). Tai: https://dotnet.microsoft.com/download/dotnet/10.0" }
+}
 
 $PyCmd = $null
 foreach ($p in @("python", "python3")) {
@@ -162,22 +165,26 @@ Remove-Item (Join-Path $RepoDir "src_wasm\pkg\rdp\.gitignore"), `
             (Join-Path $RepoDir "src_wasm\pkg\rdp\package.json"), `
             (Join-Path $RepoDir "src_wasm\pkg\rdp\README.md") -Force -ErrorAction SilentlyContinue
 
-# ---------- 5c. Build wasm dotnet_wrapper (.NET 10) ----------
-Step "Build wasm dotnet_wrapper (.NET 10)"
-$dotnetDir = Join-Path $RepoDir "src_wasm\dotnet_wrapper"
-Push-Location $dotnetDir
-if (Test-Path bin) { Remove-Item bin -Recurse -Force }
-if (Test-Path obj) { Remove-Item obj -Recurse -Force }
-dotnet publish Tools.NetWrapper.csproj -c Release
-$dnExit = $LASTEXITCODE
-Pop-Location
-if ($dnExit -ne 0) { Fail "dotnet publish that bai" }
-$fwDir = Join-Path $dotnetDir "bin\Release\net10.0\browser-wasm\AppBundle\_framework"
-if (-not (Test-Path $fwDir)) { Fail "Khong thay AppBundle/_framework: $fwDir" }
-$pkgDotnet = Join-Path $RepoDir "src_wasm\pkg\dotnet"
-if (Test-Path $pkgDotnet) { Remove-Item $pkgDotnet -Recurse -Force }
-New-Item -ItemType Directory -Force $pkgDotnet | Out-Null
-Copy-Item (Join-Path $fwDir "*") $pkgDotnet -Recurse -Force
+# ---------- 5c. Build wasm dotnet_wrapper (.NET 10) — bo qua tru khi co -WithDotnet ----------
+if ($WithDotnet) {
+    Step "Build wasm dotnet_wrapper (.NET 10)"
+    $dotnetDir = Join-Path $RepoDir "src_wasm\dotnet_wrapper"
+    Push-Location $dotnetDir
+    if (Test-Path bin) { Remove-Item bin -Recurse -Force }
+    if (Test-Path obj) { Remove-Item obj -Recurse -Force }
+    dotnet publish Tools.NetWrapper.csproj -c Release
+    $dnExit = $LASTEXITCODE
+    Pop-Location
+    if ($dnExit -ne 0) { Fail "dotnet publish that bai" }
+    $fwDir = Join-Path $dotnetDir "bin\Release\net10.0\browser-wasm\AppBundle\_framework"
+    if (-not (Test-Path $fwDir)) { Fail "Khong thay AppBundle/_framework: $fwDir" }
+    $pkgDotnet = Join-Path $RepoDir "src_wasm\pkg\dotnet"
+    if (Test-Path $pkgDotnet) { Remove-Item $pkgDotnet -Recurse -Force }
+    New-Item -ItemType Directory -Force $pkgDotnet | Out-Null
+    Copy-Item (Join-Path $fwDir "*") $pkgDotnet -Recurse -Force
+} else {
+    Write-Host "Bo qua build dotnet_wrapper (them -WithDotnet de build)"
+}
 
 # ---------- 5d. Tai wasm cimbar (prebuilt tu release libcimbar) ----------
 Step "Tai wasm cimbar (prebuilt v0.6.8)"
