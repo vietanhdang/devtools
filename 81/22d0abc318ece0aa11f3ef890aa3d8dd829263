@@ -1,0 +1,19 @@
+src_wasm/ultraviewer/src/screen/mod.rs
+  s_4c5d930908288c::t_45df49385c8500 149-156,163,165-167,169-170,197-228,374-383,385-387
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "8122d0abc318ece0aa11f3ef890aa3d8dd829263",
+  "prompts": {},
+  "sessions": {
+    "s_4c5d930908288c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ea11817c-0a06-4ec1-87a5-e579fc82ac99",
+        "model": "unknown"
+      },
+      "human_author": "dvanh2 <dvanh2@rd.misa.com.vn>"
+    }
+  }
+}
