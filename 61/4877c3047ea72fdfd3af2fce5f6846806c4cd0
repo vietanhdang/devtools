@@ -1,0 +1,19 @@
+src_wasm/ultraviewer/src/session.rs
+  s_4c5d930908288c::t_b78035560a265c 1082
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "614877c3047ea72fdfd3af2fce5f6846806c4cd0",
+  "prompts": {},
+  "sessions": {
+    "s_4c5d930908288c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ea11817c-0a06-4ec1-87a5-e579fc82ac99",
+        "model": "unknown"
+      },
+      "human_author": "dvanh2 <dvanh2@rd.misa.com.vn>"
+    }
+  }
+}
