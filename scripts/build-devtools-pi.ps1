@@ -3,14 +3,17 @@
 #   .\build-devtools-pi.ps1                          # build, khong chep sang Pi
 #   .\build-devtools-pi.ps1 -PiUser ubuntu -PiIp 192.168.1.50   # build + scp sang Pi
 # Yeu cau truoc khi chay: Node 22+, Go 1.25+, git, Python 3. Rust/wasm-pack/trunk thieu thi script tu cai.
-# Build wasm nhu scripts/build_wasm.sh: ultraviewer, iron_rdp (rdp), cimbar (prebuilt), photocraft.
+# Build wasm nhu scripts/build_wasm.sh: ultraviewer, iron_rdp (rdp), cimbar (prebuilt).
 # dotnet_wrapper chi build khi co -WithDotnet (can .NET SDK 10).
+# photocraft chi build khi co -WithPhotocraft (can trunk + clang cho feature heif).
 
 param(
     [string]$PiUser = "pi",
     [string]$PiIp = "",
     # Tam thoi bo qua build dotnet_wrapper (can .NET SDK 10). Them -WithDotnet de build lai.
-    [switch]$WithDotnet
+    [switch]$WithDotnet,
+    # Tam thoi bo qua build photocraft (can trunk + clang). Them -WithPhotocraft de build lai.
+    [switch]$WithPhotocraft
 )
 
 $ErrorActionPreference = "Stop"
@@ -113,8 +116,8 @@ if (-not (Get-Command wasm-pack -ErrorAction SilentlyContinue)) {
     Remove-Item $archPath, $extractDir -Recurse -Force -ErrorAction SilentlyContinue
 }
 
-# ---------- 2b. trunk (build photocraft) ----------
-if (-not (Get-Command trunk -ErrorAction SilentlyContinue)) {
+# ---------- 2b. trunk (build photocraft) — chi can khi co -WithPhotocraft ----------
+if ($WithPhotocraft -and -not (Get-Command trunk -ErrorAction SilentlyContinue)) {
     Step "Cai trunk (cargo install, mat vai phut)"
     cargo install trunk --locked
     if ($LASTEXITCODE -ne 0) { Fail "cargo install trunk that bai" }
@@ -208,50 +211,54 @@ Copy-Item $cimbarGlue.FullName (Join-Path $pkgCimbar "cimbar_js.js") -Force
 Copy-Item $cimbarWasm.FullName (Join-Path $pkgCimbar "cimbar_js.wasm") -Force
 Remove-Item $cimbarTar, $cimbarExtract -Recurse -Force -ErrorAction SilentlyContinue
 
-# ---------- 5e. Build wasm photocraft (trunk) ----------
-Step "Build wasm photocraft (trunk)"
-$craftDir = Join-Path $RepoDir "src_wasm\photocraft"
-$craftExt = Join-Path $craftDir "external_repo"
-if (-not (Test-Path (Join-Path $craftExt "apps\photocraft-web"))) {
-    git clone https://github.com/tonguyenducmanh/photocraft.git $craftExt
-    if ($LASTEXITCODE -ne 0) { Fail "git clone photocraft that bai" }
-}
-Tm-GitPullIfRepo $craftExt
-Push-Location (Join-Path $craftExt "apps\photocraft-web")
-trunk build --release
-$trunkExit = $LASTEXITCODE
-Pop-Location
-if ($trunkExit -ne 0) { Fail "trunk build photocraft that bai" }
-$pkgCraft = Join-Path $RepoDir "src_wasm\pkg\photocraft"
-if (Test-Path $pkgCraft) { Remove-Item $pkgCraft -Recurse -Force }
-New-Item -ItemType Directory -Force $pkgCraft | Out-Null
-Copy-Item (Join-Path $craftExt "dist\web\*") $pkgCraft -Recurse -Force
+# ---------- 5e. Build wasm photocraft (trunk) — bo qua tru khi co -WithPhotocraft ----------
+if ($WithPhotocraft) {
+    Step "Build wasm photocraft (trunk)"
+    $craftDir = Join-Path $RepoDir "src_wasm\photocraft"
+    $craftExt = Join-Path $craftDir "external_repo"
+    if (-not (Test-Path (Join-Path $craftExt "apps\photocraft-web"))) {
+        git clone https://github.com/tonguyenducmanh/photocraft.git $craftExt
+        if ($LASTEXITCODE -ne 0) { Fail "git clone photocraft that bai" }
+    }
+    Tm-GitPullIfRepo $craftExt
+    Push-Location (Join-Path $craftExt "apps\photocraft-web")
+    trunk build --release
+    $trunkExit = $LASTEXITCODE
+    Pop-Location
+    if ($trunkExit -ne 0) { Fail "trunk build photocraft that bai" }
+    $pkgCraft = Join-Path $RepoDir "src_wasm\pkg\photocraft"
+    if (Test-Path $pkgCraft) { Remove-Item $pkgCraft -Recurse -Force }
+    New-Item -ItemType Directory -Force $pkgCraft | Out-Null
+    Copy-Item (Join-Path $craftExt "dist\web\*") $pkgCraft -Recurse -Force
 
-# Nen wasm thanh .wasm.gz + patch index.html (browser tu giai nen DecompressionStream)
-# = port cua scripts/wasm_dist_common.sh (gioi han 25 MiB/file cua Cloudflare).
-$craftWasm = Get-ChildItem $pkgCraft -Filter "*_bg.wasm" | Select-Object -First 1
-if ($craftWasm) {
-    $gzPath = "$($craftWasm.FullName).gz"
-    $inFs = [IO.File]::OpenRead($craftWasm.FullName)
-    $outFs = [IO.File]::Create($gzPath)
-    $gzStream = New-Object IO.Compression.GzipStream($outFs, [IO.Compression.CompressionLevel]::Optimal)
-    $inFs.CopyTo($gzStream)
-    $gzStream.Dispose(); $outFs.Dispose(); $inFs.Dispose()
-    Remove-Item $craftWasm.FullName -Force
-    & $PyCmd (Join-Path $RepoDir "scripts\patch_wasm_dist.py") (Join-Path $pkgCraft "index.html") "$($craftWasm.Name).gz" --app PhotoCraft
-    if ($LASTEXITCODE -ne 0) { Fail "patch index.html photocraft that bai" }
+    # Nen wasm thanh .wasm.gz + patch index.html (browser tu giai nen DecompressionStream)
+    # = port cua scripts/wasm_dist_common.sh (gioi han 25 MiB/file cua Cloudflare).
+    $craftWasm = Get-ChildItem $pkgCraft -Filter "*_bg.wasm" | Select-Object -First 1
+    if ($craftWasm) {
+        $gzPath = "$($craftWasm.FullName).gz"
+        $inFs = [IO.File]::OpenRead($craftWasm.FullName)
+        $outFs = [IO.File]::Create($gzPath)
+        $gzStream = New-Object IO.Compression.GzipStream($outFs, [IO.Compression.CompressionLevel]::Optimal)
+        $inFs.CopyTo($gzStream)
+        $gzStream.Dispose(); $outFs.Dispose(); $inFs.Dispose()
+        Remove-Item $craftWasm.FullName -Force
+        & $PyCmd (Join-Path $RepoDir "scripts\patch_wasm_dist.py") (Join-Path $pkgCraft "index.html") "$($craftWasm.Name).gz" --app PhotoCraft
+        if ($LASTEXITCODE -ne 0) { Fail "patch index.html photocraft that bai" }
+    } else {
+        Write-Host "Canh bao: khong thay *_bg.wasm trong pkg\photocraft (bo qua buoc nen)"
+    }
+    Remove-Item (Join-Path $pkgCraft "_headers"), (Join-Path $pkgCraft ".htaccess"), (Join-Path $pkgCraft "HOSTING.md") -Force -ErrorAction SilentlyContinue
+    $craftGlue = Get-ChildItem $pkgCraft -Filter "*.js" | Where-Object { $_.Name -notlike "*.map" } | Select-Object -First 1
+    $craftWasmFinal = Get-ChildItem $pkgCraft | Where-Object { $_.Name -like "*_bg.wasm*" } | Select-Object -First 1
+    if ($craftGlue -and $craftWasmFinal) {
+        $manifest = "{`n  `"glue`": `"$($craftGlue.Name)`",`n  `"wasm`": `"$($craftWasmFinal.Name)`"`n}"
+        [IO.File]::WriteAllText((Join-Path $pkgCraft "manifest.json"), $manifest, (New-Object Text.UTF8Encoding($false)))
+    }
+    $oversize = Get-ChildItem $pkgCraft -Recurse -File | Where-Object { $_.Length -gt 25MB }
+    if ($oversize) { Fail "File vuot 25 MiB trong pkg\photocraft: $($oversize.Name -join ', ')" }
 } else {
-    Write-Host "Canh bao: khong thay *_bg.wasm trong pkg\photocraft (bo qua buoc nen)"
+    Write-Host "Bo qua build photocraft (them -WithPhotocraft de build)"
 }
-Remove-Item (Join-Path $pkgCraft "_headers"), (Join-Path $pkgCraft ".htaccess"), (Join-Path $pkgCraft "HOSTING.md") -Force -ErrorAction SilentlyContinue
-$craftGlue = Get-ChildItem $pkgCraft -Filter "*.js" | Where-Object { $_.Name -notlike "*.map" } | Select-Object -First 1
-$craftWasmFinal = Get-ChildItem $pkgCraft | Where-Object { $_.Name -like "*_bg.wasm*" } | Select-Object -First 1
-if ($craftGlue -and $craftWasmFinal) {
-    $manifest = "{`n  `"glue`": `"$($craftGlue.Name)`",`n  `"wasm`": `"$($craftWasmFinal.Name)`"`n}"
-    [IO.File]::WriteAllText((Join-Path $pkgCraft "manifest.json"), $manifest, (New-Object Text.UTF8Encoding($false)))
-}
-$oversize = Get-ChildItem $pkgCraft -Recurse -File | Where-Object { $_.Length -gt 25MB }
-if ($oversize) { Fail "File vuot 25 MiB trong pkg\photocraft: $($oversize.Name -join ', ')" }
 
 # ---------- 5f. Kiem tra import section wasm (Luat 15: khong duoc co module "env") ----------
 Step "Kiem tra import section wasm (Luat 15)"
