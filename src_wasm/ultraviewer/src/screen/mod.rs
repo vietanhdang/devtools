@@ -147,13 +147,12 @@ impl ScreenInit {
 
     /// Monitor rectangles (left, top, right, bottom); empty when absent or malformed.
     ///
-    /// Chấp nhận 2 định dạng record (tách nhau bằng '|', '|' cuối tuỳ chọn,
-    /// đệm NUL cuối bị bỏ như client gốc):
-    /// - `left:top:right:bottom` — dạng MacViewer giả định.
-    /// - `left, top, width, height` — dạng thật của host Windows: chuỗi do
-    ///   `mMonitor.RECT.ToString()` của RemoteControl.dll dựng (xác nhận bằng
-    ///   reflection: "11, 22, 1920, 1080" cho RECT 11,22,1931,1102). Nếu
-    ///   width/height <= 0 thì thử hiểu theo right/bottom trước khi bỏ qua.
+    /// Định dạng thật (bắt từ host 6.6, 2 màn 1920x1080):
+    /// `0:0:1920:1080:-1|1920:0:3840:1080:0|` — mỗi record 5 trường
+    /// `left:top:right:bottom:flag` (flag -1 = màn chính), tách nhau bằng '|',
+    /// '|' cuối tuỳ chọn, đệm NUL cuối bị bỏ. Trường thứ 5 bị bỏ qua.
+    /// Cũng chấp nhận 4 trường `left:top:right:bottom` (dạng MacViewer giả
+    /// định) và dạng `left, top, width, height` của `RECT.ToString()`.
     pub fn monitors(&self) -> Vec<[i32; 4]> {
         let Some(mut p) = self.monitor_info.as_deref() else { return vec![] };
         while p.last() == Some(&0) {
@@ -194,28 +193,31 @@ pub(crate) fn command(parts: &[&[u8]], expected: u8) -> std::result::Result<(), 
     Ok(())
 }
 
-/// Đọc 4 số nguyên cách nhau bằng `sep`, bỏ khoảng trắng quanh mỗi số.
-fn four_numbers(record: &str, sep: char) -> Option<(i32, i32, i32, i32)> {
-    let n: Vec<i32> = record.split(sep).map(|f| f.trim().parse().ok()).collect::<Option<Vec<_>>>()?;
-    match n[..] {
-        [a, b, c, d] => Some((a, b, c, d)),
-        _ => None,
-    }
+/// Đọc các số nguyên cách nhau bằng `sep`, bỏ khoảng trắng quanh mỗi số.
+fn numbers(record: &str, sep: char) -> Option<Vec<i32>> {
+    record.split(sep).map(|f| f.trim().parse().ok()).collect::<Option<Vec<_>>>()
 }
 
 /// Chuyển 1 record thành [left, top, right, bottom].
+///
+/// Chấp nhận 4 hoặc 5 trường (trường thứ 5 — flag "màn chính" — bị bỏ qua).
 fn parse_monitor_record(record: &str) -> Option<[i32; 4]> {
-    let (left, top, c, d) = if record.contains(':') {
-        four_numbers(record, ':')?
+    let (n, colon) = if record.contains(':') {
+        (numbers(record, ':')?, true)
     } else {
-        let (l, t, w, h) = four_numbers(record, ',')?;
-        if w > 0 && h > 0 {
-            return Some(valid_rect(l, t, l.checked_add(w)?, t.checked_add(h)?)?);
-        }
-        // width/height <= 0: có thể host gửi right/bottom với dấu ','.
-        (l, t, w, h)
+        (numbers(record, ',')?, false)
     };
-    valid_rect(left, top, c, d)
+    if n.len() != 4 && n.len() != 5 {
+        return None;
+    }
+    if colon {
+        return valid_rect(n[0], n[1], n[2], n[3]);
+    }
+    // Dạng "left, top, width, height": width/height <= 0 thì thử right/bottom.
+    if n[2] > 0 && n[3] > 0 {
+        return valid_rect(n[0], n[1], n[0].checked_add(n[2])?, n[1].checked_add(n[3])?);
+    }
+    valid_rect(n[0], n[1], n[2], n[3])
 }
 
 fn valid_rect(left: i32, top: i32, right: i32, bottom: i32) -> Option<[i32; 4]> {
@@ -371,6 +373,8 @@ pub(crate) mod tests {
         let m = |t: &[u8]| ScreenInit { monitor_info: Some(t.to_vec()), ..Default::default() }.monitors();
         assert_eq!(m(b"-1920:0:0:1080|0:-200:2560:1240|"), [[-1920, 0, 0, 1080], [0, -200, 2560, 1240]]);
         assert_eq!(m(b"0:0:1920:1080|\0\0"), [[0, 0, 1920, 1080]]);
+        // Capture thật từ host 6.6 (2 màn 1920x1080): 5 trường, flag cuối bị bỏ.
+        assert_eq!(m(b"0:0:1920:1080:-1|1920:0:3840:1080:0|"), [[0, 0, 1920, 1080], [1920, 0, 3840, 1080]]);
         // Host Windows (RemoteControl.dll RECT.ToString): "left, top, width, height".
         assert_eq!(m(b"0, 0, 1920, 1080|1920, 0, 1920, 1080|"), [[0, 0, 1920, 1080], [1920, 0, 3840, 1080]]);
         assert_eq!(m(b"-1920, 0, 1920, 1080|"), [[-1920, 0, 0, 1080]]);
@@ -383,7 +387,7 @@ pub(crate) mod tests {
         assert_eq!(m(b"0:0:1920:1080||"), [[0, 0, 1920, 1080]]);
         assert!(m(b"").is_empty());
         for bad in [&b"\00:0:1920:1080|"[..], b"0:0:1920:1080|\0 ", b"0:0:1920:1080|\00|", b"Mac|",
-                    b"0:0:1920|", b"0:0:1:1:2|", b"0:0:2147483648:1|",
+                    b"0:0:1920|", b"0:0:1:1:2:3|", b"0:0:2147483648:1|",
                     b"1:0:1:1|", b"0:1:1:0|", b"-2147483648:0:2147483647:1|", b"0, 0, 1|"] {
             assert!(m(bad).is_empty(), "{:?}", String::from_utf8_lossy(bad));
         }
