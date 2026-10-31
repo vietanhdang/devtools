@@ -51,6 +51,7 @@ func addRoute(app *http.ServeMux) {
 	// Inject router cho từng nghiệp vụ
 	router.InjectCommonRouter(app)
 	router.InjectAuthRouter(app)
+	router.InjectUserSettingRouter(app)
 	router.InjectAPITestingRouter(app)
 	router.InjectMockAPIRouter(app)
 	router.InjectFileOpsRouter(app)

@@ -283,6 +283,8 @@ export default {
         me.$tmEnum.cacheConfig.UserSettings,
         me.currentUserSetting,
       );
+      // UserSettingsV2: đẩy xuống daemon (best-effort, lỗi thì còn cache local)
+      await me.$tmUtility.syncUserSettingsToServer();
       me.$tmUtility.reloadApp();
     },
     handleChangeAgentURL() {

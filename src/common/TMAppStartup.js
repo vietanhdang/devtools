@@ -14,6 +14,11 @@ class TMAppStartup {
       agentURL: userSetting["agentURL"],
     });
 
+    // UserSettingsV2: setting chính lưu ở daemon — kéo về merge đè lên local
+    // (daemon offline thì dùng local như cũ). Chạy sau khi có agentURL.
+    userSetting = await utility.loadRemoteUserSettings();
+    utility.userSettings = userSetting;
+
     utility.setTheme(userSetting["theme"]);
     utility.setAppFont(userSetting["appFont"]);
     // đảm bảo rằng __env là một đối tượng bất biến

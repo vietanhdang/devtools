@@ -67,6 +67,13 @@ Script chính thức:
 - Mock API (port 8888) là listener riêng, không đi qua auth.
 - Endpoint: `GET /auth/status`, `POST /auth/login|/logout|/change_credentials|/set_enabled` (response chuẩn `{success, message, data}`).
 
+### 4c. UserSettingsV2 — setting lưu xuống daemon
+
+- Setting của user (theme, font, language, hiệu ứng...) lưu ở daemon (bảng `tm_user_setting`, key `user_settings`, value JSON) thay vì chỉ localStorage — đổi máy / xoá cache vẫn giữ nguyên.
+- Endpoint: `GET /user_setting/get`, `POST /user_setting/save {value}` (đi qua auth khi login bật).
+- FE: `TMUtility.loadRemoteUserSettings()` kéo về merge đè local lúc khởi động (backend thắng); `TMUtility.saveUserSettings()` + trang Settings tự đẩy xuống daemon sau mỗi lần lưu (best-effort — daemon offline thì còn cache local).
+- **`agentURL` luôn giữ theo máy** (local): cần nó để biết gọi daemon ở đâu trước khi kịp đọc setting từ daemon.
+
 ## 5. Build WASM (chỉ khi cần)
 
 ```bash
