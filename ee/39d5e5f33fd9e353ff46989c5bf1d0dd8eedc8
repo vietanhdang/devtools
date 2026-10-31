@@ -1,0 +1,19 @@
+src/common/TMAppStartup.js
+  s_8b22e300c18a22::t_80a5c6ceecd5fc 4,9-44,55-57,60
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "ee39d5e5f33fd9e353ff46989c5bf1d0dd8eedc8",
+  "prompts": {},
+  "sessions": {
+    "s_8b22e300c18a22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "719a17cf-6a2e-4e21-89d6-51466b0272c1",
+        "model": "unknown"
+      },
+      "human_author": "dvanh2 <dvanh2@rd.misa.com.vn>"
+    }
+  }
+}
