@@ -1,0 +1,19 @@
+src/i18n/i18nData.js
+  s_4c5d930908288c::t_3809d562393669 30,33,36-42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "47245d227fb9b94f146576d2de247d76f1353ac8",
+  "prompts": {},
+  "sessions": {
+    "s_4c5d930908288c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ea11817c-0a06-4ec1-87a5-e579fc82ac99",
+        "model": "unknown"
+      },
+      "human_author": "dvanh2 <dvanh2@rd.misa.com.vn>"
+    }
+  }
+}
