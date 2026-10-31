@@ -1,6 +1,7 @@
 export default {
   i18nUserSettings: {
     saveSetting: "Lưu thiết lập",
+    saveSuccess: "Đã lưu thiết lập",
     themeSetting: {
       light: "Sáng",
       dark: "Tối",

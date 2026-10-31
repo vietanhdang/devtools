@@ -470,6 +470,34 @@ class TMUtility {
     window.location.reload();
   }
   /**
+   * Trang mở bằng IP LAN (daemon phục vụ web) nhưng agentURL vẫn trỏ localhost
+   * → cookie session đăng nhập bị coi là cross-site (SameSite=Lax) nên mỗi lần
+   * reload/lưu setting lại bị đòi đăng nhập lại. Đổi host agentURL theo host
+   * của trang (giữ nguyên port), chỉ áp dụng cho trang http không phải localhost.
+   */
+  _resolveAgentURLForPage(agentURL) {
+    try {
+      if (!agentURL) {
+        return agentURL;
+      }
+      let page = new URL(window.location.href);
+      let agent = new URL(agentURL);
+      let isLocalHost = (host) =>
+        host === "localhost" || host === "127.0.0.1" || host === "::1";
+      if (
+        page.protocol === "http:" &&
+        !isLocalHost(page.hostname) &&
+        isLocalHost(agent.hostname)
+      ) {
+        agent.hostname = page.hostname;
+        return agent.origin;
+      }
+    } catch (e) {
+      // agentURL không hợp lệ — giữ nguyên
+    }
+    return agentURL;
+  }
+  /**
    * lấy ra thiết lập hiện tại
    */
   async getUserSettings(key) {
@@ -478,6 +506,9 @@ class TMUtility {
     if (cacheData) {
       currentUserSetting = Object.assign(currentUserSetting, cacheData);
     }
+    currentUserSetting.agentURL = this._resolveAgentURLForPage(
+      currentUserSetting.agentURL,
+    );
     if (currentUserSetting.theme) {
       currentUserSetting.theme = this._resolveLegacyTheme(
         currentUserSetting.theme,

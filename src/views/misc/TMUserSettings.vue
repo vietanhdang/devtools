@@ -88,11 +88,12 @@
           />
         </div>
       </div>
-      <div class="divide"></div>
-      <div class="flex flex-col setting-group">
-        <div class="user-setting-section-title">
-          {{ $t("i18nCommon.security.title") }}
-        </div>
+    </div>
+    <div class="flex flex-col setting-group setting-group-security">
+      <div class="user-setting-section-title">
+        {{ $t("i18nCommon.security.title") }}
+      </div>
+      <div class="flex security-items">
         <div class="flex user-setting-item">
           <TMCheckbox
             :variant="$tmEnum.checkboxType.switch"
@@ -147,6 +148,9 @@ import TMAgentAPI from "@/common/api/request/AgentAPI/TMAgentAPI.js";
 import TMAuthAPI from "@/common/api/request/AgentAPI/TMAuthAPI.js";
 import { getUserSettingDefault } from "@/common/TMUserSettingDefault.js";
 import { appState } from "@/stores/TMAppState.js";
+import eventBus from "@/common/event/TMEventBus.js";
+import { TMEnumEventBus } from "@/common/event/TMEnumEventBus.js";
+import { loadLocale } from "@/i18n/i18nData.js";
 
 export default {
   name: "TMUserSettings",
@@ -162,6 +166,9 @@ export default {
         newUsername: "",
         newPassword: "",
       },
+      // Trạng thái gốc từ daemon/ngôn ngữ đang dùng — để chỉ áp dụng khi đổi
+      initialEnableLogin: false,
+      initialLanguage: "vi",
       themeOption: me.$tmEnum.monacoThemeList,
       languageOption: [
         { value: "vi", label: me.$t("i18nGlobal.language.vi") },
@@ -213,6 +220,7 @@ export default {
       if (cacheData) {
         me.currentUserSetting = Object.assign(me.currentUserSetting, cacheData);
       }
+      me.initialLanguage = me.currentUserSetting.currentLanguage;
     },
     /**
      * Trạng thái đăng nhập lấy từ daemon (config server), không phải cache client
@@ -224,6 +232,7 @@ export default {
         const data = res?.data?.data;
         if (data) {
           me.securitySetting.enableLogin = !!data.enabled;
+          me.initialEnableLogin = !!data.enabled;
         }
       } catch (e) {
         // Daemon không trả lời — giữ mặc định tắt
@@ -253,23 +262,30 @@ export default {
             return;
           }
           me.$tmToast.success(me.$t("i18nCommon.security.credentialsChanged"));
+          me.securitySetting.currentPassword = "";
+          me.securitySetting.newUsername = "";
+          me.securitySetting.newPassword = "";
         }
 
-        const enableRes = await new TMAuthAPI().setEnabled(
-          me.securitySetting.enableLogin,
-        );
-        if (!enableRes?.data?.success) {
-          me.$tmToast.error(
-            enableRes?.data?.message ||
-              me.$t("i18nCommon.security.settingSaveFailed"),
+        // Chỉ gọi set_enabled khi thật sự đổi — gọi lại giá trị cũ sẽ
+        // clear session (tắt) và bắt đăng nhập lại oan
+        if (me.securitySetting.enableLogin !== me.initialEnableLogin) {
+          const enableRes = await new TMAuthAPI().setEnabled(
+            me.securitySetting.enableLogin,
           );
-          return;
+          if (!enableRes?.data?.success) {
+            me.$tmToast.error(
+              enableRes?.data?.message ||
+                me.$t("i18nCommon.security.settingSaveFailed"),
+            );
+            return;
+          }
+          me.initialEnableLogin = me.securitySetting.enableLogin;
         }
-        me.$tmToast.success(me.$t("i18nCommon.security.settingSaved"));
 
-        // Đồng bộ lại trạng thái gate login rồi reload cho sạch
+        // Cập nhật gate đăng nhập live, KHÔNG reload app
         appState.authRequired = me.securitySetting.enableLogin;
-        me.$tmUtility.reloadApp();
+        me.$tmToast.success(me.$t("i18nCommon.security.settingSaved"));
       } catch (e) {
         me.$tmToast.error(me.$t("i18nCommon.security.settingSaveFailed"));
       }
@@ -279,13 +295,36 @@ export default {
       me.saveTheme();
       me.saveAppFont();
       me.handleChangeAgentURL();
+      // Áp dụng live qua event bus (giống menu header), không reload app —
+      // reload làm app quay lại màn hình đăng nhập nếu cookie chưa kịp
+      eventBus.emit(
+        TMEnumEventBus.themeChanged,
+        me.currentUserSetting.theme,
+      );
+      eventBus.emit(
+        TMEnumEventBus.backgroundEffectChanged,
+        me.currentUserSetting.backgroundEffect,
+      );
+      eventBus.emit(
+        TMEnumEventBus.cursorEffectChanged,
+        me.currentUserSetting.cursorEffect,
+      );
+      eventBus.emit(
+        TMEnumEventBus.welcomeBackgroundChanged,
+        me.currentUserSetting.welcomeBackground,
+      );
+      appState.sideBarMenuPosition = me.currentUserSetting.sideBarMenuPosition;
+      if (me.currentUserSetting.currentLanguage !== me.initialLanguage) {
+        await loadLocale(me.currentUserSetting.currentLanguage);
+        me.initialLanguage = me.currentUserSetting.currentLanguage;
+      }
       await me.$tmCache.set(
         me.$tmEnum.cacheConfig.UserSettings,
         me.currentUserSetting,
       );
       // UserSettingsV2: đẩy xuống daemon (best-effort, lỗi thì còn cache local)
       await me.$tmUtility.syncUserSettingsToServer();
-      me.$tmUtility.reloadApp();
+      me.$tmToast.success(me.$t("i18nUserSettings.saveSuccess"));
     },
     handleChangeAgentURL() {
       let me = this;
@@ -318,13 +357,12 @@ export default {
     gap: var(--padding);
     .divide {
       width: var(--padding);
-      height: 100%;
+      align-self: stretch;
       background-color: var(--bg-layer-color);
       border-radius: var(--border-radius);
     }
     .setting-group {
       width: 100%;
-      height: 100%;
       gap: var(--padding);
       justify-content: flex-start;
       .user-setting-section-title {
@@ -333,6 +371,26 @@ export default {
       .user-setting-item {
         width: 100%;
         justify-content: space-between;
+        .input-setting {
+          width: 200px;
+        }
+      }
+    }
+  }
+  .setting-group-security {
+    width: 100%;
+    gap: var(--padding);
+    .user-setting-section-title {
+      font-weight: bold;
+    }
+    .security-items {
+      width: 100%;
+      gap: calc(var(--padding) * 2);
+      align-items: center;
+      .user-setting-item {
+        width: auto;
+        justify-content: flex-start;
+        gap: var(--padding);
         .input-setting {
           width: 200px;
         }

@@ -826,10 +826,12 @@ export default {
       // tự quay về "tất cả".
       me.selectedMonitor = me.client.selected_monitor();
       me.updateViewOffset();
-      const sz = me.client.screen_size();
-      if (sz && sz[0] && sz[1]) {
-        me.canvasWidth = sz[0];
-        me.canvasHeight = sz[1];
+      // Canvas theo kích thước VÙNG đang xem (1 màn hình), không theo kích
+      // thước desktop đầy — nếu không tỷ lệ toạ độ chuột bị sai.
+      const vs = me.client.view_size();
+      if (vs && vs[0] && vs[1]) {
+        me.canvasWidth = vs[0];
+        me.canvasHeight = vs[1];
       }
       me.addLog(
         me.$t("i18nCommon.ultraViewer.monitorSwitched", {
