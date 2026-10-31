@@ -27,12 +27,19 @@ let getNestedValue = (obj, path) => {
 /**
  * lấy value i18n trong data
  * @param {*} key giá trị i18n
+ * @param {*} params (tuỳ chọn) thay placeholder {name} trong chuỗi i18n
  * @returns
  */
-let t = (key) => {
+let t = (key, params) => {
   let message = state.messages[state.locale];
   let fallback = state.messages[state.fallbackLocale];
-  return getNestedValue(message, key) || getNestedValue(fallback, key) || key;
+  let text = getNestedValue(message, key) || getNestedValue(fallback, key) || key;
+  if (params) {
+    for (let [name, value] of Object.entries(params)) {
+      text = text.replaceAll(`{${name}}`, value);
+    }
+  }
+  return text;
 };
 
 /**
