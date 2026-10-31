@@ -1,0 +1,33 @@
+docs/development.md
+  s_8b22e300c18a22::t_aa11965a03cd40 70,72-75
+src/common/TMAppStartup.js
+  s_8b22e300c18a22::t_9be53b3de3cf34 18-20,22-27
+src/common/TMUtility.js
+  s_8b22e300c18a22::t_55e4881996d383 528
+src/common/api/request/AgentAPI/TMUserSettingAPI.js
+  s_8b22e300c18a22::t_b9a0341087bd61 4,20
+src/common/cache/TMCache.js
+  s_8b22e300c18a22::t_178b314528a4cf 125,148,210,213
+src/views/misc/TMUserSettings.vue
+  s_8b22e300c18a22::t_d0fa8388f620e2 325
+src_backend/tm_core_service/internal/router/rt_user_setting.go
+  s_8b22e300c18a22::t_e931cf6ae38a78 9
+src_backend/tm_core_service/internal/service/bl_user_setting.go
+  s_8b22e300c18a22::t_87ca5782366ce7 11-13,46,52,73
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "72302f86b0b1673f1b60d2b7f38398942bcd8704",
+  "prompts": {},
+  "sessions": {
+    "s_8b22e300c18a22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "719a17cf-6a2e-4e21-89d6-51466b0272c1",
+        "model": "unknown"
+      },
+      "human_author": "dvanh2 <dvanh2@rd.misa.com.vn>"
+    }
+  }
+}
