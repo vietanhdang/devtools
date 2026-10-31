@@ -1,0 +1,25 @@
+scripts/build-devtools-pi.ps1
+  s_76ecf3d218c76a::t_92edc6c4f8e896 364-371
+scripts/build-devtools-server.ps1
+  s_76ecf3d218c76a::t_eb050b32eee221 367-374
+src_backend/tm_app/internal/common/tm_start_up.go
+  s_76ecf3d218c76a::t_6725d42763ab1e 21
+src_backend/tm_core_service/external/api_app/tm_api_builder.go
+  s_76ecf3d218c76a::t_7fa05ac0c710e9 18-22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "efb95b00c43da4acb2bcbf656a27438486f4f75f",
+  "prompts": {},
+  "sessions": {
+    "s_76ecf3d218c76a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "84ef98c0-fc35-4da9-9782-c5716de07124",
+        "model": "unknown"
+      },
+      "human_author": "dvanh2 <dvanh2@rd.misa.com.vn>"
+    }
+  }
+}
