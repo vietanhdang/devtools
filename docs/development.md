@@ -67,12 +67,12 @@ Script chính thức:
 - Mock API (port 8888) là listener riêng, không đi qua auth.
 - Endpoint: `GET /auth/status`, `POST /auth/login|/logout|/change_credentials|/set_enabled` (response chuẩn `{success, message, data}`).
 
-### 4c. UserSettingsV2 — setting lưu xuống daemon
+### 4c. Cache localStorage — setting lưu xuống daemon
 
-- Setting của user (theme, font, language, hiệu ứng...) lưu ở daemon (bảng `tm_user_setting`, key `user_settings`, value JSON) thay vì chỉ localStorage — đổi máy / xoá cache vẫn giữ nguyên.
-- Endpoint: `GET /user_setting/get`, `POST /user_setting/save {value}` (đi qua auth khi login bật).
-- FE: `TMUtility.loadRemoteUserSettings()` kéo về merge đè local lúc khởi động (backend thắng); `TMUtility.saveUserSettings()` + trang Settings tự đẩy xuống daemon sau mỗi lần lưu (best-effort — daemon offline thì còn cache local).
-- **`agentURL` luôn giữ theo máy** (local): cần nó để biết gọi daemon ở đâu trước khi kịp đọc setting từ daemon.
+- Toàn bộ cache mức **localStorage** (UserSettings + các `*ConfigLayout`, `MonacoTheme`, `PostgreSQLBinPath`, `UltraViewerProfile`, `AgreementAccepted`...) lưu ở daemon (bảng `tm_user_setting`, mỗi key 1 row, value JSON) — đổi máy / xoá cache vẫn giữ nguyên. Cache mức indexedDB (lịch sử tool, OTP...) và session/inMemory **không** đồng bộ.
+- Endpoint: `GET /user_setting/get_all`, `POST /user_setting/save {key, value}` (đi qua auth khi login bật).
+- FE (`TMCache.js`): mỗi lần `set()` key localStorage tự xếp hàng đẩy xuống daemon (debounce 1s, best-effort — daemon offline thì còn cache local); `applyRemoteCache()` kéo `get_all` về ghi đè local lúc khởi động (backend thắng), gọi từ `TMAppStartup` sau khi có agentURL.
+- `agentURL` cũng đồng bộ theo; `TMUtility._resolveAgentURLForPage()` tự sửa host localhost theo host của trang lúc đọc nên mở app từ máy khác bằng IP LAN vẫn gọi đúng daemon.
 
 ## 5. Build WASM (chỉ khi cần)
 

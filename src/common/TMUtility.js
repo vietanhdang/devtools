@@ -3,7 +3,6 @@ import i18nData from "@/i18n/i18nData.js";
 import cache from "@/common/cache/TMCache.js";
 import enumeration from "@/common/TMEnum.js";
 import { getUserSettingDefault } from "@/common/TMUserSettingDefault.js";
-import TMUserSettingAPI from "@/common/api/request/AgentAPI/TMUserSettingAPI.js";
 import { getAppVarsByTheme, getThemeBase } from "@/monarch/TMMonacoTheme.js";
 /**
  * các method TMutility dùng cho toàn bộ frontend
@@ -526,46 +525,8 @@ class TMUtility {
   async saveUserSettings(key, val) {
     let allSettings = await this.getUserSettings();
     allSettings[key] = val;
+    // cache.set tự đẩy xuống daemon (xem TMCache._queueRemoteSet)
     await cache.set(enumeration.cacheConfig.UserSettings, allSettings);
-    // UserSettingsV2: đẩy luôn xuống daemon (best-effort — daemon offline thì
-    // setting vẫn còn ở cache local, lần kết nối được sẽ tự đồng bộ lại)
-    this.syncUserSettingsToServer();
-  }
-  /**
-   * UserSettingsV2: đẩy toàn bộ setting hiện tại xuống daemon.
-   * agentURL giữ ở local mỗi máy (cần nó để biết gọi daemon ở đâu).
-   */
-  async syncUserSettingsToServer() {
-    try {
-      let allSettings = await this.getUserSettings();
-      let { agentURL, ...rest } = allSettings;
-      await new TMUserSettingAPI().save(rest);
-    } catch (e) {
-      // daemon không trả lời — bỏ qua
-    }
-  }
-  /**
-   * UserSettingsV2: kéo setting từ daemon về, merge đè lên local
-   * (backend thắng, riêng agentURL giữ theo máy). Gọi sau khi đã biết agentURL.
-   */
-  async loadRemoteUserSettings() {
-    let currentUserSetting = await this.getUserSettings();
-    try {
-      const res = await new TMUserSettingAPI().get();
-      const remote = res?.data?.data;
-      if (remote && typeof remote === "object") {
-        currentUserSetting = Object.assign({}, currentUserSetting, remote, {
-          agentURL: currentUserSetting.agentURL,
-        });
-        await cache.set(
-          enumeration.cacheConfig.UserSettings,
-          currentUserSetting,
-        );
-      }
-    } catch (e) {
-      // daemon không trả lời — dùng setting local như cũ
-    }
-    return currentUserSetting;
   }
   /**
    * lấy theme monaco editor đã lưu, null = theo app theme

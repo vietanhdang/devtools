@@ -15,14 +15,16 @@ class TMAppStartup {
       agentURL: userSetting["agentURL"],
     });
 
-    // UserSettingsV2: setting chính lưu ở daemon — kéo về merge đè lên local
-    // (daemon offline thì dùng local như cũ). Chạy sau khi có agentURL.
-    userSetting = await utility.loadRemoteUserSettings();
-    utility.userSettings = userSetting;
-
-    // Các cache localStorage khác (ConfigLayout, profile, MonacoTheme...)
-    // cũng lưu ở daemon — kéo về ghi đè lên local.
+    // Toàn bộ cache localStorage (UserSettings + các ConfigLayout, profile,
+    // MonacoTheme...) lưu ở daemon — kéo về ghi đè lên local. Daemon offline
+    // thì dùng local như cũ. Chạy sau khi có agentURL.
     await cache.applyRemoteCache();
+    userSetting = await utility.getUserSettings();
+    utility.userSettings = userSetting;
+    // agentURL có thể đã đổi theo server — cập nhật lại cho tầng automation
+    TMAutomation.setGlobalInfoBeforeRequest({
+      agentURL: userSetting["agentURL"],
+    });
 
     utility.setTheme(userSetting["theme"]);
     utility.setAppFont(userSetting["appFont"]);

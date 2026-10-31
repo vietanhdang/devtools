@@ -122,9 +122,7 @@ class TMCache {
 
   /**
    * Kéo toàn bộ setting đã lưu trên daemon về ghi đè lên cache local
-   * (server thắng — giống UserSettingsV2). Chạy lúc khởi động, sau khi đã
-   * biết agentURL. Key "UserSettingsV2" bỏ qua vì có luồng riêng
-   * (loadRemoteUserSettings giữ agentURL theo từng máy).
+   * (server thắng). Chạy lúc khởi động, sau khi đã biết agentURL.
    */
   async applyRemoteCache() {
     let data = null;
@@ -140,7 +138,6 @@ class TMCache {
     }
     this._remotePulling = true;
     try {
-      const userSettingsFormat = TMCacheConfig.UserSettings.KeyFormat;
       for (const configKey of Object.keys(TMCacheConfig)) {
         const config = TMCacheConfig[configKey];
         if (config.CacheLevel !== tmEnum.cacheType.local) {
@@ -148,7 +145,7 @@ class TMCache {
         }
         // Các key localStorage đều không có tham số {id} nên KeyFormat
         // chính là tên key đã lưu trên daemon.
-        if (!(config.KeyFormat in data) || config.KeyFormat === userSettingsFormat) {
+        if (!(config.KeyFormat in data)) {
           continue;
         }
         await this.set(EnumCacheConfig[configKey], data[config.KeyFormat]);
@@ -210,11 +207,10 @@ class TMCache {
     }
 
     // Cache mức localStorage thì đẩy xuống daemon để đổi máy / xoá cache
-    // trình duyệt vẫn giữ nguyên cấu hình (trừ UserSettingsV2 có luồng riêng).
+    // trình duyệt vẫn giữ nguyên cấu hình.
     if (
       !this._remotePulling &&
-      config.CacheLevel === tmEnum.cacheType.local &&
-      key !== TMCacheConfig.UserSettings.KeyFormat
+      config.CacheLevel === tmEnum.cacheType.local
     ) {
       this._queueRemoteSet(key, valueSave);
     }
