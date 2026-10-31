@@ -1,0 +1,37 @@
+docs/development.md
+  s_76ecf3d218c76a::t_92c91fce37a7ec 70-76
+src/common/TMAppStartup.js
+  s_76ecf3d218c76a::t_6a95da7cf04b9d 17-21
+src/common/TMUtility.js
+  s_76ecf3d218c76a::t_edaa6f58ccb312 6,499-537
+src/common/api/request/AgentAPI/TMUserSettingAPI.js
+  s_76ecf3d218c76a::t_c45bce35595cb6 1-27
+src/views/misc/TMUserSettings.vue
+  s_76ecf3d218c76a::t_41ec495a1c058a 286-287
+src_backend/tm_core_service/external/api_app/tm_api_builder.go
+  s_76ecf3d218c76a::t_7f5a9e8fc40ffa 54
+src_backend/tm_core_service/internal/database/migrations/0005_user_setting.sql
+  s_76ecf3d218c76a::t_093fcfbcd2ce70 1-13
+src_backend/tm_core_service/internal/model/tm_user_setting.go
+  s_76ecf3d218c76a::t_8dc89883cb8c8d 1-13
+src_backend/tm_core_service/internal/router/rt_user_setting.go
+  s_76ecf3d218c76a::t_5b6116f6d37588 1-13
+src_backend/tm_core_service/internal/service/bl_user_setting.go
+  s_76ecf3d218c76a::t_0b706d5a8cfcd1 1-70
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "3c8c5d43e181f290a16f0e7790d02829322fc24a",
+  "prompts": {},
+  "sessions": {
+    "s_76ecf3d218c76a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "84ef98c0-fc35-4da9-9782-c5716de07124",
+        "model": "unknown"
+      },
+      "human_author": "dvanh2 <dvanh2@rd.misa.com.vn>"
+    }
+  }
+}
