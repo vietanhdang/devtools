@@ -1079,7 +1079,7 @@ impl Session {
             parts.len(),
             init.width,
             init.height,
-            parts.get(8).map(crate::wire::hex).unwrap_or_default(),
+            parts.get(8).map(|p| crate::wire::hex(p)).unwrap_or_default(),
             parts.get(8).map(|p| String::from_utf8_lossy(p)).unwrap_or_default(),
         );
         // Màn hình khởi tạo đến qua kênh LAN trực tiếp → chuyển đường chính
