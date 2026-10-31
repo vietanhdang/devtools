@@ -25,7 +25,7 @@
 
     <div class="tm-header-right">
       <span
-        v-if="appState.isLoggedIn"
+        v-if="isLoggedIn"
         class="tm-header-logout"
         v-tooltip="$t('i18nCommon.login.logout')"
         @click="logoutFunc"
@@ -151,6 +151,10 @@ export default {
       return (
         appState.sideBarMenuPosition === this.$tmEnum.sideBarMenuPosition.Header
       );
+    },
+    // Template khong truy cap duoc import module (appState) truc tiep — qua computed
+    isLoggedIn() {
+      return appState.isLoggedIn;
     },
     sideBarMenuPositionItems() {
       return this.$tmEnum.sideBarMenuPositionList.map((item) => ({
