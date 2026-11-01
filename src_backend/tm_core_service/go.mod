@@ -8,6 +8,7 @@ require (
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/gorilla/websocket v1.5.3
 	github.com/jackc/pgx/v5 v5.10.0
+	golang.org/x/crypto v0.36.0
 	modernc.org/sqlite v1.44.3
 	tm_config v0.0.0-00010101000000-000000000000
 )
