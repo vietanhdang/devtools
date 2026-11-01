@@ -1,0 +1,21 @@
+src_wasm/ultraviewer/src/screen/renderer.rs
+  s_3c5033206f4528::t_52d1a608ccbbd6 473-475,478,498-500,506-509,746-753
+src_wasm/ultraviewer/src/session.rs
+  s_3c5033206f4528::t_5e3d0375813af7 39-42,632-633
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "8af44e6d9e290bb2aaed0597dce2bbf9af320481",
+  "prompts": {},
+  "sessions": {
+    "s_3c5033206f4528": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f7e0983b-b7b1-472a-99e2-8575ec98bad9",
+        "model": "unknown"
+      },
+      "human_author": "dvanh2 <dvanh2@rd.misa.com.vn>"
+    }
+  }
+}
