@@ -411,7 +411,6 @@ export default {
   height: 100%;
   overflow-y: auto;
   .settings-container {
-    max-width: 720px;
     margin: 0 auto;
     padding: var(--padding-large);
     display: flex;

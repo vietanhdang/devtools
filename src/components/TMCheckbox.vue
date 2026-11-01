@@ -24,13 +24,13 @@
         <span class="tm-checkbox">
           <span v-if="modelValue" class="tm-checkbox-active"></span>
         </span>
-        <span class="tm-label-content">{{ label.capitalize() }}</span>
+        <span class="tm-label-content">{{ (label || "").capitalize() }}</span>
       </span>
       <span
         v-else-if="variant == $tmEnum.checkboxType.switch"
         class="flex tm-checkbox-visible tm-switch-layout"
       >
-        <span class="tm-label-content">{{ label.capitalize() }}</span>
+        <span class="tm-label-content">{{ (label || "").capitalize() }}</span>
         <button
           type="button"
           class="tm-theme-toggle-switch"
