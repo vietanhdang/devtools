@@ -1,0 +1,19 @@
+src/views/misc/TMWelcome.vue
+  s_9fa404d1bb34a0::t_d763208aba0155 6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "019ab7d7482c295b85516888cbaaf65aea9f9f3f",
+  "prompts": {},
+  "sessions": {
+    "s_9fa404d1bb34a0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8e84fadb-f41e-4c62-b924-3a7da6c2138e",
+        "model": "unknown"
+      },
+      "human_author": "dvanh2 <dvanh2@rd.misa.com.vn>"
+    }
+  }
+}
