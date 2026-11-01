@@ -557,6 +557,37 @@ impl UltraViewerClient {
         }
     }
 
+    /// Gửi Ctrl+Alt+Del tới máy đối tác.
+    pub fn send_ctrl_alt_del(&self) -> Result<(), JsValue> {
+        let mut state = self.state.borrow_mut();
+        match state.session.as_mut() {
+            Some(session) => session
+                .send_ctrl_alt_del()
+                .map_err(|e| JsValue::from_str(&e.to_string())),
+            None => Err(JsValue::from_str("The remote session is not connected.")),
+        }
+    }
+
+    /// Đổi chất lượng hình ảnh (30 = nhanh, 45 = cân bằng, 70 = đẹp).
+    /// Gọi trước khi kết nối thì giá trị đi theo lệnh login.
+    pub fn set_display_quality(&self, quality: i32) {
+        let mut state = self.state.borrow_mut();
+        if let Some(session) = state.session.as_mut() {
+            session.set_display_quality(quality);
+        }
+    }
+
+    /// Bật/tắt hình nền máy đối tác (chỉ có tác dụng khi đã kết nối).
+    pub fn set_remote_wallpaper(&self, enabled: bool) -> Result<(), JsValue> {
+        let mut state = self.state.borrow_mut();
+        match state.session.as_mut() {
+            Some(session) => session
+                .set_remote_wallpaper(enabled)
+                .map_err(|e| JsValue::from_str(&e.to_string())),
+            None => Err(JsValue::from_str("The remote session is not connected.")),
+        }
+    }
+
     pub fn is_control_enabled(&self) -> bool {
         self.state.borrow().session.as_ref().map(|s| s.is_control_enabled()).unwrap_or(false)
     }

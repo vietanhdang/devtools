@@ -945,6 +945,11 @@ export default {
       copyFrameFailed: "Không sao chép được khung hình",
       showLog: "Hiển thị log",
       showLocalCursor: "Con trỏ mượt",
+      displayQuality: "Chất lượng hình",
+      qualitySpeed: "Nhanh (mờ hơn)",
+      qualityAuto: "Cân bằng",
+      qualityHigh: "Đẹp (nặng mạng)",
+      remoteWallpaper: "Hình nền máy đối tác",
       clipboardSync: "Đồng bộ clipboard",
       allowDirect: "Kết nối LAN trực tiếp",
       allowDirectHint:
@@ -1151,6 +1156,7 @@ export default {
     },
     tmfulltab: {
       dragToolbar: "Click và giữ để kéo thả thanh công cụ",
+      collapseToolbar: "Thu gọn thanh công cụ (rê chuột lên mép trên để hiện lại)",
     },
     cimbar: {
       tab: {

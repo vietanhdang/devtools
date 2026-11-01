@@ -5,6 +5,7 @@
         <TMFullTabWrapper
           v-model="isFullTab"
           :alwaysShowToolbar="true"
+          :collapsible="true"
           fullScreenBgColor="#000"
           class="tm-uv-wrapper"
         >
@@ -46,6 +47,17 @@
               @click="toggleControl"
             >
               <span class="tm-icon tm-command-code-icon"></span>
+            </div>
+            <!-- Ctrl+Alt+Del: mở màn hình bảo mật của máy đối tác (lệnh 22,
+                 giống menu Actions của client gốc — Windows vẫn có thể chặn
+                 theo quyền của máy đó) -->
+            <div
+              v-tooltip="$t('i18nCommon.remoteDesktop.ctrlAltDel')"
+              class="flex toolbar-btn"
+              :class="{ 'toolbar-btn-disabled': !isConnected }"
+              @click="sendCtrlAltDel"
+            >
+              <span class="tm-icon tm-menu-icon"></span>
             </div>
             <!-- Chat: mở popup nổi (không che màn hình) để vẫn xem/thao tác
                  màn hình từ xa được trong lúc chat. Ở chế độ fullscreen thì
@@ -260,6 +272,28 @@
             @change="updateAllowDirect"
           ></TMCheckbox>
 
+          <!-- Chất lượng hình ảnh máy đối tác nén trước khi gửi (lệnh 31):
+               30 = nhanh nhưng mờ, 45 = cân bằng, 70 = đẹp nhưng nặng mạng.
+               Đổi giữa phiên áp dụng ngay. -->
+          <div class="flex tm-uv-quality-row">
+            <div>{{ $t("i18nCommon.ultraViewer.displayQuality") }}</div>
+            <TMComboBox
+              :width="160"
+              v-model="currentConfigLayout.displayQuality"
+              :options="qualityOptions"
+              :noMargin="true"
+              @selected="updateDisplayQuality"
+            />
+          </div>
+
+          <!-- Hình nền máy đối tác: tắt để màn hình từ xa vẽ nhanh hơn (lệnh 23) -->
+          <TMCheckbox
+            :variant="$tmEnum.checkboxType.switch"
+            v-model="currentConfigLayout.remoteWallpaper"
+            :label="$t('i18nCommon.ultraViewer.remoteWallpaper')"
+            @change="updateRemoteWallpaper"
+          ></TMCheckbox>
+
           <TMCheckbox
             :variant="$tmEnum.checkboxType.switch"
             v-model="currentConfigLayout.showLocalCursor"
@@ -356,6 +390,10 @@ export default {
         allowDirect: false,
         // Hiển thị con trỏ máy tính (mượt, 60-144fps không trễ như IronRDP).
         showLocalCursor: false,
+        // Chất lượng hình máy đối tác nén (30/45/70 — lệnh 31).
+        displayQuality: 45,
+        // Hình nền máy đối tác (lệnh 23) — tắt cho mượt hơn.
+        remoteWallpaper: true,
       },
       isHideEffectBackground: false,
       isFullTab: false,
@@ -465,6 +503,14 @@ export default {
      */
     isChatPopupOpen() {
       return !!this.chatPopupId;
+    },
+    /** Các mức chất lượng hình (lệnh 31 — 30/45/70 như client gốc). */
+    qualityOptions() {
+      return [
+        { value: 30, label: this.$t("i18nCommon.ultraViewer.qualitySpeed") },
+        { value: 45, label: this.$t("i18nCommon.ultraViewer.qualityAuto") },
+        { value: 70, label: this.$t("i18nCommon.ultraViewer.qualityHigh") },
+      ];
     },
     sidebarOptions() {
       let options = [];
@@ -658,6 +704,14 @@ export default {
           // Tạm thời: chẩn đoán part 8 (monitor info) để đối chiếu định dạng
           // host thật gửi. Xóa khi đã chắc chắn parser đúng.
           me.addLog(client.init_debug(), "info");
+          // Hình nền máy đối tác theo cấu hình (lệnh 23 — host mặc định bật).
+          if (!me.currentConfigLayout.remoteWallpaper) {
+            try {
+              client.set_remote_wallpaper(false);
+            } catch (e) {
+              // Máy đối tác từ chối thì giữ nguyên, không chặn phiên.
+            }
+          }
           const canvas = me.$refs.uvCanvas;
           if (canvas) canvas.focus();
         });
@@ -733,6 +787,8 @@ export default {
           window.screen?.height || 1080,
           me.currentConfigLayout.allowDirect,
         );
+        // Chất lượng hình đi theo lệnh login (session gửi "32|||2" + "31|||v").
+        client.set_display_quality(me.currentConfigLayout.displayQuality);
       } catch (e) {
         me.isConnecting = false;
         me.reportError(
@@ -761,6 +817,46 @@ export default {
       me.isViewOnly = false;
       me.chatState.isTyping = false;
       me.isDirectRoute = false;
+    },
+
+    /**
+     * Gửi Ctrl+Alt+Del tới máy đối tác (lệnh 22 — máy Windows có thể chặn
+     * theo quyền/chính sách, giống khi bấm phím thật qua remote).
+     */
+    sendCtrlAltDel() {
+      let me = this;
+      if (!me.client) return;
+      try {
+        me.client.send_ctrl_alt_del();
+      } catch (e) {
+        me.addLog(
+          `${me.$t("i18nCommon.remoteDesktop.ctrlAltDel")}: ${me.formatError(e)}`,
+          "warn",
+        );
+      }
+    },
+
+    /** Đổi chất lượng hình — áp dụng ngay giữa phiên (lệnh 31). */
+    updateDisplayQuality() {
+      let me = this;
+      me.updateConfigLayout();
+      if (!me.client) return;
+      me.client.set_display_quality(me.currentConfigLayout.displayQuality);
+    },
+
+    /** Bật/tắt hình nền máy đối tác (lệnh 23). */
+    updateRemoteWallpaper() {
+      let me = this;
+      me.updateConfigLayout();
+      if (!me.client || !me.isConnected) return;
+      try {
+        me.client.set_remote_wallpaper(me.currentConfigLayout.remoteWallpaper);
+      } catch (e) {
+        me.addLog(
+          `${me.$t("i18nCommon.ultraViewer.remoteWallpaper")}: ${me.formatError(e)}`,
+          "warn",
+        );
+      }
     },
 
     /**
@@ -1332,6 +1428,13 @@ export default {
   /* Utility `.flex` đặt align-items:center → trong flex cột, khối con bị co
      theo nội dung. Kéo giãn hết chiều ngang để lấp đúng bề rộng sidebar. */
   align-items: stretch;
+}
+
+/* Hàng chọn chất lượng hình: nhãn trái, combobox phải */
+.tm-uv-quality-row {
+  justify-content: space-between;
+  width: 100%;
+  gap: var(--padding);
 }
 
 .tm-uv-setting {

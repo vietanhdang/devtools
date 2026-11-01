@@ -950,6 +950,11 @@ export default {
       copyFrameFailed: "Could not copy frame",
       showLog: "Show log",
       showLocalCursor: "Smooth local pointer",
+      displayQuality: "Image quality",
+      qualitySpeed: "Fast (lower detail)",
+      qualityAuto: "Balanced",
+      qualityHigh: "High detail (heavier)",
+      remoteWallpaper: "Partner wallpaper",
       clipboardSync: "Sync clipboard",
       allowDirect: "Direct LAN connection",
       allowDirectHint:
@@ -1160,6 +1165,7 @@ export default {
     },
     tmfulltab: {
       dragToolbar: "Click and hold to drag the toolbar",
+      collapseToolbar: "Collapse the toolbar (hover the top edge to reveal)",
     },
     cimbar: {
       tab: {

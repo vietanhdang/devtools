@@ -27,7 +27,7 @@ use crate::transport::{
 };
 use crate::wire::{
     decode_envelope, decode_multipart, forward_envelope, random_string, relay_keepalive_envelope, system_envelope,
-    CommandCipher, Envelope, Ipv4, Result, MAX_FRAME,
+    utf16le, CommandCipher, Envelope, Ipv4, Result, MAX_FRAME,
 };
 
 /// Host của kênh lệnh (đăng ký + tra cứu).
@@ -415,6 +415,27 @@ impl Session {
     /// Chất lượng hình ảnh hiện tại.
     pub fn display_quality(&self) -> i32 {
         self.display_quality
+    }
+
+    /// Gửi Ctrl+Alt+Del tới máy đối tác (lệnh "22" qua SendString UTF-16,
+    /// giống menu Actions của client gốc — Windows vẫn có thể chặn theo
+    /// quyền/chính sách của máy đó).
+    pub fn send_ctrl_alt_del(&mut self) -> Result<()> {
+        if !self.can_send_input() {
+            return Err("The remote session is not connected.".into());
+        }
+        self.send_peer_flagged(true, &utf16le("22"));
+        Ok(())
+    }
+
+    /// Bật/tắt hình nền máy đối tác (lệnh "23|||-1/0" qua SendString UTF-16).
+    pub fn set_remote_wallpaper(&mut self, visible: bool) -> Result<()> {
+        if !self.active {
+            return Err("The remote session is not connected.".into());
+        }
+        let text = format!("23|||{}", if visible { -1 } else { 0 });
+        self.send_peer_flagged(true, &utf16le(&text));
+        Ok(())
     }
 
     /// Ảnh con trỏ hiện tại của máy đối tác (0xAARRGGBB, top-down) + điểm nóng.

@@ -1,12 +1,13 @@
 <template>
-  <div class="tm-full-tab-wrapper" :class="{ 'tm-full-tab-wrapper-active': modelValue }" :style="wrapperStyle">
+  <div class="tm-full-tab-wrapper" :class="{ 'tm-full-tab-wrapper-active': modelValue }" :style="wrapperStyle" @mousemove="onWrapperMouseMove">
     <div
       ref="toolbarRef"
       class="fullscreen-toolbar"
       :class="{
         'toolbar-pinned': isToolbarPinned && !hasCustomPosition,
         'toolbar-dragging': isDragging,
-        'toolbar-dragged': hasCustomPosition
+        'toolbar-dragged': hasCustomPosition,
+        'toolbar-collapsed': isCollapsed
       }"
       :style="toolbarStyle"
       v-if="modelValue || alwaysShowToolbar"
@@ -29,6 +30,12 @@
           </div>
         </template>
       </template>
+      <!-- Thu gọn: thanh trượt hẳn lên trên, rê chuột lên mép trên để hiện lại -->
+      <div v-if="collapsible && !isCollapsed"
+        v-tooltip="$t('i18nCommon.tmfulltab.collapseToolbar')" class="flex toolbar-btn"
+        @click.stop="collapseToolbar">
+        <span class="tm-icon tm-minus-icon"></span>
+      </div>
 
       <div class="flex tm-toolbar-utility-area">
         <slot name="toolbar-left"></slot>
@@ -105,6 +112,11 @@ export default {
     positionKey: {
       type: String,
       default: "tm-full-tab-wrapper-toolbar"
+    },
+    /** Cho phép thu gọn thanh công cụ (nút trượt hẳn lên trên). */
+    collapsible: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -113,6 +125,7 @@ export default {
       toolbarLeft: null,
       toolbarTop: null,
       isDragging: false,
+      isCollapsed: false,
       dragStartX: 0,
       dragStartY: 0,
       dragStartLeft: 0,
@@ -168,6 +181,18 @@ export default {
       this.isToolbarPinned = false;
       if (this.savePosition) {
         this.restorePosition();
+      }
+    },
+    /** Thu gọn thanh công cụ: trượt hẳn lên trên, không chiếm không gian. */
+    collapseToolbar() {
+      this.isCollapsed = true;
+    },
+    /** Rê chuột lên sát mép trên của vùng nội dung → hiện thanh lại. */
+    onWrapperMouseMove(e) {
+      if (!this.isCollapsed) return;
+      const rect = this.$el.getBoundingClientRect();
+      if (e.clientY - rect.top <= 6) {
+        this.isCollapsed = false;
       }
     },
     toggleFullScreen() {
@@ -348,6 +373,13 @@ export default {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
     pointer-events: auto;
+  }
+
+  &.toolbar-collapsed {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-100%);
+    pointer-events: none;
+    box-shadow: none;
   }
 
   &.toolbar-dragged {
