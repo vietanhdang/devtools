@@ -1,0 +1,29 @@
+src/components/TMFullTabWrapper.vue
+  s_3c5033206f4528::t_b6938711931f4f 2,9-10,33-38,115-119,128,186-197,378-384
+src/i18n/en/i18nCommon.js
+  s_3c5033206f4528::t_6a0e3aadd5e996 953-957,1168
+src/i18n/vi/i18nCommon.js
+  s_3c5033206f4528::t_136125a5cb7571 948-952,1159
+src/views/tools/TMRemoteDesktopUltraViewer.vue
+  s_3c5033206f4528::t_4db0c90f7eb428 8,51-61,275-296,393-396,507-514,707-714,790-791,822-861,1433-1439
+src_wasm/ultraviewer/src/session.rs
+  s_3c5033206f4528::t_8d1ac1164a89f7 30,420-440
+src_wasm/ultraviewer/src/wasm_glue.rs
+  s_3c5033206f4528::t_6d39e1c141cb17 560-590
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "9a822277b907cc58dc66895554997f06b2883147",
+  "prompts": {},
+  "sessions": {
+    "s_3c5033206f4528": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f7e0983b-b7b1-472a-99e2-8575ec98bad9",
+        "model": "unknown"
+      },
+      "human_author": "dvanh2 <dvanh2@rd.misa.com.vn>"
+    }
+  }
+}
