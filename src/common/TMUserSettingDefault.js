@@ -1,20 +1,16 @@
 import tmEnum from "@/common/TMEnum.js";
 
 /**
- * FE và daemon chạy cùng máy (docker) khác port — mặc định trỏ agentURL về
- * hostname của trang hiện tại, giữ port từ config agentServer.
+ * FE và daemon cùng máy, đi qua reverse proxy (https) — mặc định agentURL là
+ * origin của trang + /api (proxy chuyển tiếp sang backend), tránh mixed content
+ * khi trỏ thẳng http://host:7777.
  */
 function defaultAgentURL() {
   let configured = window.__env?.APITesting?.agentServer;
-  try {
-    let agent = new URL(configured);
-    if (window.location.hostname) {
-      agent.hostname = window.location.hostname;
-    }
-    return agent.origin;
-  } catch (e) {
-    return configured;
+  if (window.location.origin?.startsWith("http")) {
+    return `${window.location.origin}/api`;
   }
+  return configured;
 }
 
 /**

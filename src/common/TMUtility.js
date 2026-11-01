@@ -473,6 +473,8 @@ class TMUtility {
    * → cookie session đăng nhập bị coi là cross-site (SameSite=Lax) nên mỗi lần
    * reload/lưu setting lại bị đòi đăng nhập lại. Đổi host agentURL theo host
    * của trang (giữ nguyên port), chỉ áp dụng cho trang http không phải localhost.
+   * Trang https mà agentURL là http → mixed content bị chặn, đổi sang
+   * origin trang + /api (reverse proxy chuyển tiếp sang backend).
    */
   _resolveAgentURLForPage(agentURL) {
     try {
@@ -483,6 +485,9 @@ class TMUtility {
       let agent = new URL(agentURL);
       let isLocalHost = (host) =>
         host === "localhost" || host === "127.0.0.1" || host === "::1";
+      if (page.protocol === "https:" && agent.protocol === "http:") {
+        return `${page.origin}/api`;
+      }
       if (
         page.protocol === "http:" &&
         !isLocalHost(page.hostname) &&
