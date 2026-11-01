@@ -21,7 +21,18 @@ fi
 
 # Cập nhật source mới nhất trước khi build (git pull origin) nếu là git repo
 . "$(dirname "$SCRIPT_DIR")/../scripts/git_pull_if_repo.sh"
+
+# Upstream ironrdp-connector có `#[expect(single_use_lifetimes)]` không còn fire
+# trên rustc mới -> warning unfulfilled_lint_expectations. Hoàn tác patch cũ trước
+# khi pull (giữ working tree sạch), patch lại sau khi pull.
+CONNECTOR_SRC="$EXTERNAL_DIR/crates/ironrdp-connector/src/connection.rs"
+if [ -f "$CONNECTOR_SRC" ]; then
+    git -C "$EXTERNAL_DIR" checkout -- "$CONNECTOR_SRC" 2>/dev/null || true
+fi
 tm_git_pull_if_repo "$EXTERNAL_DIR"
+if [ -f "$CONNECTOR_SRC" ]; then
+    sed -i 's/#\[expect(single_use_lifetimes)\]/#[allow(single_use_lifetimes)]/' "$CONNECTOR_SRC"
+fi
 
 echo "Building IronRDP WASM..."
 echo "Output directory: $OUTPUT_DIR"
