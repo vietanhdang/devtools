@@ -470,9 +470,12 @@ impl Renderer {
     /// Recovered loop order: destination x outside, y inside; the source cursor
     /// walks down one atlas column (bottom-up rows), then the next column, and
     /// continues across rectangles. Returns [sx, sy, dx, dy, w, h] per tile.
+    /// Windows 6.6 tính atlas nhiều cột theo ⌊rows/columns⌋ làm tròn xuống theo
+    /// tile nên 1-2 tile cuối có thể nằm ngoài JPEG (bản Windows đọc qua không
+    /// kiểm tra) — bỏ qua vài tile đó, giữ pixel cũ; nhiều hơn mới từ chối frame.
     fn atlas_tiles(&self, atlas: &Atlas, rects: &[Region]) -> R<Vec<[usize; 6]>> {
         let tile = self.tile_size;
-        let (mut column, mut sy, mut count) = (0usize, 0usize, 0usize);
+        let (mut column, mut sy, mut count, mut skipped) = (0usize, 0usize, 0usize, 0usize);
         let mut out = Vec::new();
         for r in rects {
             if !self.is_inside(r) {
@@ -492,12 +495,17 @@ impl Renderer {
                     }
                     let sx = column.checked_mul(tile).ok_or(ScreenError::SizeLimitExceeded)?;
                     if tw > atlas.width || th > atlas.height || sx > atlas.width - tw || sy > atlas.height - th {
-                        return Err(ScreenError::AuxiliaryAtlasOutOfBounds);
+                        skipped += 1;
+                    } else {
+                        out.push([sx, sy, r.x as usize + dx, r.y as usize + dy, tw, th]);
                     }
-                    out.push([sx, sy, r.x as usize + dx, r.y as usize + dy, tw, th]);
                     sy += th;
                 }
             }
+        }
+        let tolerated = atlas.width / tile + 2;
+        if skipped > 0 && (skipped > tolerated || out.is_empty()) {
+            return Err(ScreenError::AuxiliaryAtlasOutOfBounds);
         }
         Ok(out)
     }
@@ -735,8 +743,14 @@ mod tests {
     #[test]
     fn auxiliary_bounds_and_tile_size_updates() {
         let mut r = renderer(5, 1, 1);
-        assert_eq!(apply(&mut r, &P { jpeg: jpeg(), aux: vec![0, 0, 5, 1], ..P::seq(1) }), Err(ScreenError::AuxiliaryAtlasOutOfBounds));
-        assert_eq!(r.last_frame_number(), 0);
+        // Atlas 2x2, rect 5 tile: Windows truncate mất tile cuối — bỏ qua tile
+        // đó (giữ pixel cũ), 4 tile còn lại vẫn áp dụng.
+        assert!(apply(&mut r, &P { jpeg: jpeg(), aux: vec![0, 0, 5, 1], ..P::seq(1) }).is_ok());
+        assert_eq!(r.last_frame_number(), 1);
+        // Tile nằm ngoài atlas nhiều hơn mức chịu đựng → vẫn từ chối frame.
+        assert_eq!(apply(&mut r, &P { jpeg: jpeg(), aux: vec![0, 0, 5, 1, 0, 0, 5, 1], ..P::seq(2) }),
+                   Err(ScreenError::AuxiliaryAtlasOutOfBounds));
+        assert_eq!(r.last_frame_number(), 1);
         r.set_tile_size(&[&[48], &[2]]).unwrap();
         assert_eq!(r.tile_size(), 2);
         assert!(r.set_tile_size(&[&[48], &[0]]).is_err());

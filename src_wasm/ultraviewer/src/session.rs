@@ -36,6 +36,10 @@ pub const COMMAND_PORT: u16 = 443;
 pub const DEFAULT_RELAY_HOST: &str = "functions3.ultraviewer.net";
 /// Thời gian tối đa để đăng ký/tra cứu/nhận màn hình (giống `armDeadline`).
 pub const LOGIN_TIMEOUT_MS: f64 = 20_000.0;
+/// Thời gian chờ máy đối tác chấp thuận sau khi gửi login: host kiểu
+/// MacViewer/LinuxViewer hỏi người dùng duyệt + chọn màn hình nên cần dài
+/// hơn 20s (bản Mac để 20s hay bị ngắt oan khi người dùng duyệt chậm).
+pub const APPROVAL_TIMEOUT_MS: f64 = 60_000.0;
 /// Chu kỳ heartbeat (giống `sendHeartbeat`).
 pub const HEARTBEAT_MS: f64 = 10_000.0;
 /// Thời gian tối đa chờ máy đối tác kết nối thẳng vào listener LAN (15 giây,
@@ -625,7 +629,8 @@ impl Session {
                 if !self.direct_login_sent {
                     self.send_login(0, false);
                 }
-                self.deadline = Some(now + LOGIN_TIMEOUT_MS);
+                // Chờ máy đối tác duyệt chấp thuận (hộp thoại bên host) — 60s.
+                self.deadline = Some(now + APPROVAL_TIMEOUT_MS);
             }
             _ => {}
         }
