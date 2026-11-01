@@ -3,13 +3,12 @@
     <div class="flex flex-col wrap-container">
       <div class="container">
         <!-- Đã chọn hình nền (xem $tmEnum.welcomeBackgroundList) thì chỉ hiện ảnh
-nền phủ kín màn welcome, không hiện text author -->
+nền phủ kín màn welcome; Normal không hiện gì -->
         <div
           v-if="isShowBackground"
           class="welcome-background"
           :class="`welcome-background--${welcomeBackground}`"
         ></div>
-        <div v-else class="main-line-title">{{ welcomeTitle }}</div>
         <TMDynamicBackgroundEffect />
       </div>
     </div>
@@ -52,13 +51,6 @@ export default {
     };
   },
   computed: {
-    /**
-     * lấy ra title để hiển thị ở màn welcome
-     */
-    welcomeTitle() {
-      let me = this;
-      return me.$tmUtility.getAuthorApp() ?? me.$tmUtility.defaultTitleApp();
-    },
     /**
      * normal là không chọn ảnh nên không hiện lớp nền
      */
@@ -129,16 +121,6 @@ export default {
   flex: 1;
   /* làm mốc định vị cho lớp nền bên trong */
   position: relative;
-}
-
-.main-line-title {
-  font-size: 10cqw;
-  font-family: var(--straight-font);
-  font-weight: 600;
-  position: relative;
-  opacity: 1;
-  visibility: visible;
-  z-index: 1;
 }
 
 /* Hình nền màn welcome: inset tạo khoảng cách (margin) với mép màn hình.
