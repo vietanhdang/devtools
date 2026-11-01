@@ -26,9 +26,17 @@
             <div
               v-tooltip="$t('i18nCommon.remoteDesktop.screenshot')"
               class="flex toolbar-btn"
-              @click="takeScreenshot"
+              @click="takeScreenshot('rdpCanvas', 'i18nCommon.remoteDesktop.screenshotSaved', 'i18nCommon.remoteDesktop.screenshotFailed')"
             >
               <span class="tm-icon tm-camera-icon"></span>
+            </div>
+            <div
+              v-tooltip="$t('i18nCommon.remoteDesktop.copyFrame')"
+              class="flex toolbar-btn"
+              @click="copyCurrentFrame('rdpCanvas', 'i18nCommon.remoteDesktop.copyFrame', 'i18nCommon.remoteDesktop.frameCopied', 'i18nCommon.remoteDesktop.copyFrameFailed')"
+              :class="{ 'toolbar-btn-disabled': !isConnected }"
+            >
+              <span class="tm-icon tm-copy-icon"></span>
             </div>
             <div
               v-tooltip="$t('i18nCommon.remoteDesktop.ctrlAltDel')"
@@ -248,6 +256,7 @@ import TMFullTabWrapper from "@/components/TMFullTabWrapper.vue";
 import TMDialogUtil, { TMDialogEnum } from "@/common/TMDialogUtil.js";
 import TMCollectionList from "@/components/TMCollectionList.vue";
 import TMCollectionMixin from "@/mixins/TMCollectionMixin.js";
+import { TMRemoteDesktopMixin } from "@/mixins/TMRemoteDesktopMixin.js";
 
 // Bit values of the Rust `PerformanceFlags` bitflags, sent to the backend as a bitmask.
 const PERF_FLAG_DISABLE_WALLPAPER = 0x00000001;
@@ -285,7 +294,7 @@ const RDP_FILE_CHUNK_SIZE = 64 * 1024;
 export default {
   name: "TMRemoteDesktop",
   extends: TMToolBase,
-  mixins: [TMCollectionMixin],
+  mixins: [TMCollectionMixin, TMRemoteDesktopMixin],
   components: {
     TMSubSidebar,
     TMCollectionList,
@@ -480,18 +489,6 @@ export default {
         standard_name: tz,
         daylight_name: tz,
       };
-    },
-
-    addLog(message, type = "info") {
-      const time = new Date().toLocaleTimeString("en-US", { hour12: false });
-      this.logEntries.push({ time, message, type });
-      if (this.logEntries.length > 200) {
-        this.logEntries.splice(0, this.logEntries.length - 200);
-      }
-      this.$nextTick(() => {
-        const panel = this.$refs.logPanel;
-        if (panel) panel.scrollTop = panel.scrollHeight;
-      });
     },
 
     /**
@@ -875,20 +872,6 @@ export default {
       if (!this.isFullTab && document.fullscreenElement) {
         document.exitFullscreen();
       }
-    },
-
-    takeScreenshot() {
-      const canvas = this.$refs.rdpCanvas;
-      if (!canvas) return;
-      const dataUrl = canvas.toDataURL("image/png");
-      const link = document.createElement("a");
-      link.download = `rdp-screenshot-${Date.now()}.png`;
-      link.href = dataUrl;
-      link.click();
-      this.addLog(
-        this.$t("i18nCommon.remoteDesktop.screenshotSaved"),
-        "success",
-      );
     },
 
     sendCtrlAltDel() {
