@@ -1,0 +1,21 @@
+src/common/TMAppStartup.js
+  s_3c5033206f4528::t_59aeb3a94311af 12-23,26
+src/views/misc/TMLoginOverlay.vue
+  s_3c5033206f4528::t_5f42afd279c546 32,71-73
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "45d60efcb6b953a64617c26fd0c9b9f2a934a07e",
+  "prompts": {},
+  "sessions": {
+    "s_3c5033206f4528": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f7e0983b-b7b1-472a-99e2-8575ec98bad9",
+        "model": "unknown"
+      },
+      "human_author": "dvanh2 <dvanh2@rd.misa.com.vn>"
+    }
+  }
+}
