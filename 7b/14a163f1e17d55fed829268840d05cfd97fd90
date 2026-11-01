@@ -1,0 +1,19 @@
+.gitignore
+  s_9fa404d1bb34a0::t_1ede66e922624a 555-564
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "7b14a163f1e17d55fed829268840d05cfd97fd90",
+  "prompts": {},
+  "sessions": {
+    "s_9fa404d1bb34a0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8e84fadb-f41e-4c62-b924-3a7da6c2138e",
+        "model": "unknown"
+      },
+      "human_author": "dvanh2 <dvanh2@rd.misa.com.vn>"
+    }
+  }
+}
