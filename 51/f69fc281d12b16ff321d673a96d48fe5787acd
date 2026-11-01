@@ -1,0 +1,37 @@
+src/i18n/en/i18nCommon.js
+  s_3c5033206f4528::t_bfaee7e217dc77 970-980
+src/i18n/vi/i18nCommon.js
+  s_3c5033206f4528::t_a62ad9483e5e97 964-974
+src/views/dialogs/ultraviewer/TMUltraViewerChatBox.vue
+  s_3c5033206f4528::t_2edc0cb1f1b4db 18-69,83-89,96-102,115-118,168,215-252,373-421
+src/views/dialogs/ultraviewer/TMUltraViewerChatPopup.vue
+  s_3c5033206f4528::t_ef61cd876e5276 22-25,69-88
+src/views/tools/TMRemoteDesktopUltraViewer.vue
+  s_3c5033206f4528::t_bb35b02e15768c 294-297,395-400,596-599,688-690,813-816,933-1048
+src_wasm/ultraviewer/README.md
+  s_3c5033206f4528::t_5049dd3c4a58b6 26
+src_wasm/ultraviewer/src/filetransfer.rs
+  s_3c5033206f4528::t_2cdba462b5cc46 1-911
+src_wasm/ultraviewer/src/lib.rs
+  s_3c5033206f4528::t_a4250a6e40028c 19
+src_wasm/ultraviewer/src/session.rs
+  s_3c5033206f4528::t_728d48cd1524cd 21,110-111,214-215,284,576,589,1059,1431-1480
+src_wasm/ultraviewer/src/wasm_glue.rs
+  s_3c5033206f4528::t_e5edadd2cacece 33,77-79,94,283-285,623-652,888-892,1081-1139,1141
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "51f69fc281d12b16ff321d673a96d48fe5787acd",
+  "prompts": {},
+  "sessions": {
+    "s_3c5033206f4528": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f7e0983b-b7b1-472a-99e2-8575ec98bad9",
+        "model": "unknown"
+      },
+      "human_author": "dvanh2 <dvanh2@rd.misa.com.vn>"
+    }
+  }
+}
