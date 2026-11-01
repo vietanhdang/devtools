@@ -1,0 +1,21 @@
+src/common/TMUserSettingDefault.js
+  s_3c5033206f4528::t_f5565bd6ab61bb 4-6,10-11,13
+src/common/TMUtility.js
+  s_3c5033206f4528::t_ea5e05990052ac 476-477,488-490
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "8da04bc9977fa0ffa35d58b981bae46788f58dfb",
+  "prompts": {},
+  "sessions": {
+    "s_3c5033206f4528": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f7e0983b-b7b1-472a-99e2-8575ec98bad9",
+        "model": "unknown"
+      },
+      "human_author": "dvanh2 <dvanh2@rd.misa.com.vn>"
+    }
+  }
+}
