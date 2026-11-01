@@ -29,6 +29,7 @@
 
 <script>
 import TMAuthAPI from "@/common/api/request/AgentAPI/TMAuthAPI.js";
+import TMAppStartup from "@/common/TMAppStartup.js";
 import { appState } from "@/stores/TMAppState.js";
 
 /**
@@ -67,6 +68,9 @@ export default {
         const body = res?.data;
         if (body?.success) {
           appState.isLoggedIn = true;
+          // Startup đã chạy trước lúc chưa có session nên get_all bị chặn —
+          // kéo lại setting từ daemon giờ mới có quyền
+          await TMAppStartup.applyRemoteSettings();
         } else {
           me.errorMessage =
             body?.message || me.$t("i18nCommon.login.invalidCredentials");
