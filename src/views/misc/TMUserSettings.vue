@@ -1,10 +1,15 @@
 <template>
-  <div class="flex flex-col tm-user-setting">
-    <div class="flex setting-content">
-      <div class="flex flex-col setting-group">
-        <div class="flex user-setting-item">
-          <div>{{ $t("i18nCommon.apiTesting.tooltipUrlAgent") }}</div>
-          <div class="input-setting">
+  <div class="tm-user-setting">
+    <div class="settings-container">
+      <div class="setting-card">
+        <div class="setting-card-title">
+          {{ $t("i18nUserSettings.section.connection") }}
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">
+            {{ $t("i18nCommon.apiTesting.tooltipUrlAgent") }}
+          </div>
+          <div class="setting-control">
             <TMInput
               v-model="currentUserSetting.agentURL"
               v-tooltip="$t('i18nCommon.apiTesting.tooltipUrlAgent')"
@@ -13,98 +18,144 @@
             />
           </div>
         </div>
-        <div class="flex user-setting-item">
-          <div>{{ $t("i18nUserSettings.settings.theme") }}</div>
-          <TMComboBox
-            :width="200"
-            v-model="currentUserSetting.theme"
-            :options="themeOption"
-            :noMargin="true"
-          />
+      </div>
+
+      <div class="setting-card">
+        <div class="setting-card-title">
+          {{ $t("i18nUserSettings.section.appearance") }}
         </div>
-        <div class="flex user-setting-item">
-          <div>{{ $t("i18nUserSettings.settings.backgroundEffect") }}</div>
-          <TMComboBox
-            :width="200"
-            v-model="currentUserSetting.backgroundEffect"
-            :options="backgroundEffectOption"
-            :noMargin="true"
-          />
+        <div class="setting-row">
+          <div class="setting-label">
+            {{ $t("i18nUserSettings.settings.theme") }}
+          </div>
+          <div class="setting-control">
+            <TMComboBox
+              :width="240"
+              v-model="currentUserSetting.theme"
+              :options="themeOption"
+              :noMargin="true"
+            />
+          </div>
         </div>
-        <div class="flex user-setting-item">
-          <div>{{ $t("i18nUserSettings.settings.cursorEffect") }}</div>
-          <TMComboBox
-            :width="200"
-            v-model="currentUserSetting.cursorEffect"
-            :options="cursorEffectOption"
-            :noMargin="true"
-          />
+        <div class="setting-row">
+          <div class="setting-label">
+            {{ $t("i18nUserSettings.settings.language") }}
+          </div>
+          <div class="setting-control">
+            <TMComboBox
+              :width="240"
+              v-model="currentUserSetting.currentLanguage"
+              :options="languageOption"
+              :noMargin="true"
+            />
+          </div>
         </div>
-        <div class="flex user-setting-item">
-          <div>{{ $t("i18nUserSettings.settings.welcomeBackground") }}</div>
-          <TMComboBox
-            :width="200"
-            v-model="currentUserSetting.welcomeBackground"
-            :options="welcomeBackgroundOption"
-            :noMargin="true"
-          />
+        <div class="setting-row">
+          <div class="setting-label">
+            {{ $t("i18nUserSettings.settings.appFont") }}
+          </div>
+          <div class="setting-control">
+            <TMComboBox
+              :width="240"
+              v-model="currentUserSetting.appFont"
+              :options="appFontOption"
+              :noMargin="true"
+            />
+          </div>
         </div>
-        <div class="flex user-setting-item">
-          <div>{{ $t("i18nUserSettings.settings.appFont") }}</div>
-          <TMComboBox
-            :width="200"
-            v-model="currentUserSetting.appFont"
-            :options="appFontOption"
-            :noMargin="true"
-          />
+        <div class="setting-row">
+          <div class="setting-label">
+            {{ $t("i18nUserSettings.settings.welcomeBackground") }}
+          </div>
+          <div class="setting-control">
+            <TMComboBox
+              :width="240"
+              v-model="currentUserSetting.welcomeBackground"
+              :options="welcomeBackgroundOption"
+              :noMargin="true"
+            />
+          </div>
         </div>
-        <div class="flex user-setting-item">
-          <div>{{ $t("i18nUserSettings.settings.language") }}</div>
-          <TMComboBox
-            :width="200"
-            v-model="currentUserSetting.currentLanguage"
-            :options="languageOption"
-            :noMargin="true"
-          />
+        <div class="setting-row">
+          <div class="setting-label">
+            {{ $t("i18nUserSettings.settings.backgroundEffect") }}
+          </div>
+          <div class="setting-control">
+            <TMComboBox
+              :width="240"
+              v-model="currentUserSetting.backgroundEffect"
+              :options="backgroundEffectOption"
+              :noMargin="true"
+            />
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">
+            {{ $t("i18nUserSettings.settings.cursorEffect") }}
+          </div>
+          <div class="setting-control">
+            <TMComboBox
+              :width="240"
+              v-model="currentUserSetting.cursorEffect"
+              :options="cursorEffectOption"
+              :noMargin="true"
+            />
+          </div>
         </div>
       </div>
-      <div class="divide"></div>
-      <div class="flex flex-col setting-group">
-        <div class="flex user-setting-item">
-          <TMCheckbox
-            :variant="$tmEnum.checkboxType.switch"
-            v-model="currentUserSetting.wrapTab"
-            :label="$t('i18nUserSettings.settings.wrapTab')"
-            :noMargin="true"
-          ></TMCheckbox>
+
+      <div class="setting-card">
+        <div class="setting-card-title">
+          {{ $t("i18nUserSettings.section.layout") }}
         </div>
-        <div class="flex user-setting-item">
-          <div>{{ $t("i18nUserSettings.settings.sideBarMenuPosition") }}</div>
-          <TMComboBox
-            :width="200"
-            v-model="currentUserSetting.sideBarMenuPosition"
-            :options="sideBarMenuPositionOption"
-            :noMargin="true"
-          />
+        <div class="setting-row">
+          <div class="setting-label">
+            {{ $t("i18nUserSettings.settings.wrapTab") }}
+          </div>
+          <div class="setting-control">
+            <TMCheckbox
+              :variant="$tmEnum.checkboxType.switch"
+              v-model="currentUserSetting.wrapTab"
+              :noMargin="true"
+            ></TMCheckbox>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">
+            {{ $t("i18nUserSettings.settings.sideBarMenuPosition") }}
+          </div>
+          <div class="setting-control">
+            <TMComboBox
+              :width="240"
+              v-model="currentUserSetting.sideBarMenuPosition"
+              :options="sideBarMenuPositionOption"
+              :noMargin="true"
+            />
+          </div>
         </div>
       </div>
-    </div>
-    <div class="flex flex-col setting-group setting-group-security">
-      <div class="user-setting-section-title">
-        {{ $t("i18nCommon.security.title") }}
-      </div>
-      <div class="flex security-items">
-        <div class="flex user-setting-item">
-          <TMCheckbox
-            :variant="$tmEnum.checkboxType.switch"
-            v-model="securitySetting.enableLogin"
-            :label="$t('i18nCommon.security.enableLogin')"
-            :noMargin="true"
-          ></TMCheckbox>
+
+      <div class="setting-card">
+        <div class="setting-card-title">
+          {{ $t("i18nCommon.security.title") }}
         </div>
-        <div class="flex user-setting-item">
-          <div>{{ $t("i18nCommon.security.currentPassword") }}</div>
-          <div class="input-setting">
+        <div class="setting-row">
+          <div class="setting-label">
+            {{ $t("i18nCommon.security.enableLogin") }}
+          </div>
+          <div class="setting-control">
+            <TMCheckbox
+              :variant="$tmEnum.checkboxType.switch"
+              v-model="securitySetting.enableLogin"
+              :noMargin="true"
+            ></TMCheckbox>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">
+            {{ $t("i18nCommon.security.currentPassword") }}
+          </div>
+          <div class="setting-control">
             <TMInput
               v-model="securitySetting.currentPassword"
               :inputType="'password'"
@@ -112,15 +163,19 @@
             />
           </div>
         </div>
-        <div class="flex user-setting-item">
-          <div>{{ $t("i18nCommon.security.newUsername") }}</div>
-          <div class="input-setting">
+        <div class="setting-row">
+          <div class="setting-label">
+            {{ $t("i18nCommon.security.newUsername") }}
+          </div>
+          <div class="setting-control">
             <TMInput v-model="securitySetting.newUsername" :noMargin="true" />
           </div>
         </div>
-        <div class="flex user-setting-item">
-          <div>{{ $t("i18nCommon.security.newPassword") }}</div>
-          <div class="input-setting">
+        <div class="setting-row">
+          <div class="setting-label">
+            {{ $t("i18nCommon.security.newPassword") }}
+          </div>
+          <div class="setting-control">
             <TMInput
               v-model="securitySetting.newPassword"
               :inputType="'password'"
@@ -128,18 +183,24 @@
             />
           </div>
         </div>
+        <div class="setting-card-actions">
+          <TMButton
+            :noMargin="true"
+            :type="$tmEnum.buttonType.secondary"
+            @click="applySecuritySetting"
+            :label="$t('i18nCommon.security.apply')"
+          />
+        </div>
+      </div>
+
+      <div class="save-bar">
         <TMButton
           :noMargin="true"
-          @click="applySecuritySetting"
-          :label="$t('i18nCommon.security.apply')"
+          @click="saveSetting"
+          :label="$t('i18nUserSettings.saveSetting')"
         />
       </div>
     </div>
-    <TMButton
-      :noMargin="true"
-      @click="saveSetting"
-      :label="$t('i18nUserSettings.saveSetting')"
-    />
   </div>
 </template>
 <script>
@@ -348,52 +409,60 @@ export default {
 .tm-user-setting {
   width: 100%;
   height: 100%;
-  justify-content: flex-start;
-  align-items: center;
-  gap: var(--padding);
-  .setting-content {
-    width: 100%;
+  overflow-y: auto;
+  .settings-container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: var(--padding-large);
+    display: flex;
+    flex-direction: column;
     gap: var(--padding);
-    .divide {
-      width: var(--padding);
-      align-self: stretch;
-      background-color: var(--bg-layer-color);
-      border-radius: var(--border-radius);
+    align-items: stretch;
+  }
+  .setting-card {
+    background-color: var(--bg-layer-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: var(--padding) var(--padding-large);
+    display: flex;
+    flex-direction: column;
+    gap: var(--padding-medium);
+    .setting-card-title {
+      font-size: var(--font-size-medium-rare);
+      font-weight: bold;
+      color: var(--text-primary-color);
+      padding-bottom: var(--padding-medium);
+      border-bottom: 1px solid var(--border-color);
     }
-    .setting-group {
-      width: 100%;
+    .setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       gap: var(--padding);
-      justify-content: flex-start;
-      .user-setting-section-title {
-        font-weight: bold;
+      min-height: var(--base-component-height);
+      .setting-label {
+        color: var(--text-color);
+        font-size: var(--font-size-medium-rare);
       }
-      .user-setting-item {
-        width: 100%;
-        justify-content: space-between;
-        .input-setting {
-          width: 200px;
-        }
+      .setting-control {
+        width: 240px;
+        flex-shrink: 0;
+        display: flex;
+        justify-content: flex-end;
       }
+    }
+    .setting-card-actions {
+      display: flex;
+      justify-content: flex-end;
+      padding-top: var(--padding-medium);
     }
   }
-  .setting-group-security {
-    width: 100%;
-    gap: var(--padding);
-    .user-setting-section-title {
-      font-weight: bold;
-    }
-    .security-items {
-      width: 100%;
-      gap: calc(var(--padding) * 2);
-      align-items: center;
-      .user-setting-item {
-        width: auto;
-        justify-content: flex-start;
-        gap: var(--padding);
-        .input-setting {
-          width: 200px;
-        }
-      }
+  .save-bar {
+    display: flex;
+    justify-content: center;
+    padding: var(--padding) 0 var(--padding-large);
+    :deep(.tm-button) {
+      min-width: 180px;
     }
   }
 }

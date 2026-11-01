@@ -2,6 +2,11 @@ export default {
   i18nUserSettings: {
     saveSetting: "Save settings",
     saveSuccess: "Settings saved",
+    section: {
+      connection: "Connection",
+      appearance: "Appearance",
+      layout: "Layout",
+    },
     themeSetting: {
       light: "Light",
       dark: "Dark",

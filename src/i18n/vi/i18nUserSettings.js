@@ -2,6 +2,11 @@ export default {
   i18nUserSettings: {
     saveSetting: "Lưu thiết lập",
     saveSuccess: "Đã lưu thiết lập",
+    section: {
+      connection: "Kết nối",
+      appearance: "Giao diện",
+      layout: "Bố cục",
+    },
     themeSetting: {
       light: "Sáng",
       dark: "Tối",
