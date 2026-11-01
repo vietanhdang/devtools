@@ -1,0 +1,21 @@
+src_wasm/iron_rdp/build.sh
+  s_b09879e5463538::t_1d2cb24b2bf2ea 24-31,33-35
+src_wasm/iron_rdp/src/lib.rs
+  s_b09879e5463538::t_8b2c98d724d938 1-3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "cd5a2f9db8d6256b4b39a63644757e4c04b163c6",
+  "prompts": {},
+  "sessions": {
+    "s_b09879e5463538": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "35bb22b2-3b34-48a8-bef2-02418d912e1d",
+        "model": "unknown"
+      },
+      "human_author": "dvanh2 <dvanh2@rd.misa.com.vn>"
+    }
+  }
+}
