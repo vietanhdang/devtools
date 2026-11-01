@@ -553,3 +553,12 @@ src_wasm/pkg/
 
 # wrangler (deploy Cloudflare Pages)
 .wrangler/
+
+# Artifact reverse-engineer UltraViewer (local only — code decompile của phần
+# mềm độc quyền, không publish lên repo)
+uv_re_*
+uv_re_file/
+
+# Bản copy repo bên thứ ba dùng để tham chiếu (local only)
+LinuxViewer-upstream/
+MacViewer-src/
