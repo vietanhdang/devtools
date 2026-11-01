@@ -1,0 +1,23 @@
+src/i18n/en/i18nUserSettings.js
+  s_3c5033206f4528::t_3f64eb0ab959ce 5-9
+src/i18n/vi/i18nUserSettings.js
+  s_3c5033206f4528::t_a0a6a9208ff055 5-9
+src/views/misc/TMUserSettings.vue
+  s_3c5033206f4528::t_af31fcdbd206eb 2-12,21-25,27-38,40-51,53-64,66-77,79-103,106-109,111-134,137-152,154-158,166-170,174-178,186-196,199-200,412-418,420-435,437-440,442-445,447-451,454-457,459-465
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "b2226c9aa2648d4013457dca2bffe70b711f3175",
+  "prompts": {},
+  "sessions": {
+    "s_3c5033206f4528": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f7e0983b-b7b1-472a-99e2-8575ec98bad9",
+        "model": "unknown"
+      },
+      "human_author": "dvanh2 <dvanh2@rd.misa.com.vn>"
+    }
+  }
+}
