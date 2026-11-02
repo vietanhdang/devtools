@@ -59,6 +59,27 @@
             >
               <span class="tm-icon tm-menu-icon"></span>
             </div>
+            <!-- Toàn màn hình + khoá phím: trình duyệt nuốt Ctrl+W/T, F11...
+                 khi không ở fullscreen (preventDefault không chặn được).
+                 Keyboard Lock API chỉ có hiệu lực trong fullscreen. -->
+            <div
+              v-tooltip="
+                isBrowserFullscreen
+                  ? $t('i18nCommon.ultraViewer.exitFullscreenLock')
+                  : $t('i18nCommon.ultraViewer.fullscreenLock')
+              "
+              class="flex toolbar-btn"
+              @click="toggleFullscreenLock"
+            >
+              <span
+                class="tm-icon"
+                :class="
+                  isBrowserFullscreen
+                    ? 'tm-exit-full-screen-icon'
+                    : 'tm-full-screen-icon'
+                "
+              ></span>
+            </div>
             <!-- Chat: mở popup nổi (không che màn hình) để vẫn xem/thao tác
                  màn hình từ xa được trong lúc chat. Ở chế độ fullscreen thì
                  sidebar bị ẩn nên cần nút này trên thanh công cụ. -->
@@ -92,7 +113,7 @@
             </div>
           </template>
 
-          <div class="tm-uv-canvas-container">
+          <div ref="uvCanvasContainer" class="tm-uv-canvas-container">
             <TMDynamicBackgroundEffect
               :class="{ 'tm-uv-hide-effect': isHideEffectBackground }"
             />
@@ -397,6 +418,8 @@ export default {
       },
       isHideEffectBackground: false,
       isFullTab: false,
+      // Đang ở fullscreen thật của trình duyệt (requestFullscreen).
+      isBrowserFullscreen: false,
       isConnected: false,
       isConnecting: false,
       isViewOnly: false,
@@ -553,9 +576,18 @@ export default {
     if (!this.deviceIdentity) {
       this.deviceIdentity = this.randomHex(16);
     }
+    // Mất focus cửa sổ (Alt+Tab, click sang app khác) → nhả toàn bộ phím
+    // đang giữ, kẻo kẹt trên máy đối tác (mouseleave không bắt được trường hợp này).
+    window.addEventListener("blur", this.onWindowBlur);
+    document.addEventListener("fullscreenchange", this.onFullscreenChange);
   },
 
   beforeUnmount() {
+    window.removeEventListener("blur", this.onWindowBlur);
+    document.removeEventListener("fullscreenchange", this.onFullscreenChange);
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(() => {});
+    }
     this.handleDisconnect();
   },
 
@@ -984,6 +1016,47 @@ export default {
           : me.$t("i18nCommon.ultraViewer.controlDisabled"),
         "info",
       );
+    },
+
+    onWindowBlur() {
+      if (this.client && this.isConnected) {
+        this.client.release_input();
+      }
+    },
+
+    /**
+     * Bật/tắt fullscreen thật của trình duyệt kèm Keyboard Lock API
+     * (navigator.keyboard.lock) — cách duy nhất để chặn trình duyệt nuốt
+     * Ctrl+W, Ctrl+T, F11... khi đang điều khiển máy đối tác.
+     */
+    async toggleFullscreenLock() {
+      let me = this;
+      try {
+        if (document.fullscreenElement) {
+          await document.exitFullscreen();
+          return;
+        }
+        let el = me.$refs.uvCanvasContainer || me.$el;
+        await el.requestFullscreen();
+        // Không truyền danh sách phím = khoá tất cả phím có thể khoá được.
+        // Chỉ có hiệu lực khi đang fullscreen; trình duyệt không hỗ trợ thì bỏ qua.
+        await navigator.keyboard?.lock();
+      } catch (e) {
+        me.reportError(
+          `${me.$t("i18nCommon.ultraViewer.fullscreenLockFailed")}: ${me.formatError(e)}`,
+        );
+      }
+    },
+
+    onFullscreenChange() {
+      let me = this;
+      me.isBrowserFullscreen = !!document.fullscreenElement;
+      if (!me.isBrowserFullscreen) {
+        navigator.keyboard?.unlock();
+        // Thoát fullscreen bằng Esc: nhả phím kẹt + trả focus về canvas.
+        me.onWindowBlur();
+        me.$refs.uvCanvas?.focus();
+      }
     },
 
     updateClipboardSync() {
