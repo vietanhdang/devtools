@@ -657,6 +657,9 @@ export default {
           } catch (e) {
             // Client cũ đã hỏng rồi → bỏ qua.
           }
+          if (window.__uvClient === me.client) {
+            window.__uvClient = null;
+          }
           me.client = null;
         }
         if (!me.wasmModule) {
@@ -673,6 +676,10 @@ export default {
 
         const client = new me.wasmModule.UltraViewerClient();
         me.client = client;
+        // Chẩn đoán phiên (màn lock không stream frame…): mở console gọi
+        // __uvClient.received_commands() / __uvClient.frame_stats() /
+        // __uvClient.sent_payloads() / __uvClient.init_debug().
+        window.__uvClient = client;
 
         client.on_status((message) => {
           // Đường truyền có thể đổi (qua relay → LAN trực tiếp) trong phiên.
@@ -749,6 +756,9 @@ export default {
           me.isViewOnly = false;
           me.isDirectRoute = false;
           me.client = null;
+          if (window.__uvClient === client) {
+            window.__uvClient = null;
+          }
           // Ngắt client để dừng timer 16ms bên trong WASM (nếu không timer
           // vẫn chạy mãi dù phiên đã kết thúc).
           try {
