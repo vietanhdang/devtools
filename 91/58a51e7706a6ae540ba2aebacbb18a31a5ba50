@@ -1,0 +1,23 @@
+src/i18n/en/i18nCommon.js
+  s_4b1b86156cc9f0::t_c5822142610616 257-259,262-263
+src/i18n/vi/i18nCommon.js
+  s_4b1b86156cc9f0::t_75524b9c9bd6fb 258-260,263-264
+src/views/tools/TMVietQR.vue
+  s_4b1b86156cc9f0::t_9da0384c357f82 2-12,14-74,84-104,128-132,134-148,150-160,177-178,197-205,209,212,215-223,232-264,357-358,360-369,375-378,393,397-399,401-404,406-407,409-415,418-441,445-446,448-461,466,468-469,471-480,482-496,499-502,505-507,514,518-520,522,525,536-560,563,566,572-650
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "9158a51e7706a6ae540ba2aebacbb18a31a5ba50",
+  "prompts": {},
+  "sessions": {
+    "s_4b1b86156cc9f0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5ce3e6bc-da8f-40cb-afff-db51b9a3291b",
+        "model": "unknown"
+      },
+      "human_author": "dvanh2 <dvanh2@rd.misa.com.vn>"
+    }
+  }
+}
