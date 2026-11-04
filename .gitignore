@@ -562,3 +562,5 @@ uv_re_file/
 # Bản copy repo bên thứ ba dùng để tham chiếu (local only)
 LinuxViewer-upstream/
 MacViewer-src/
+/vietqr/
+/vietqr-core-ref/
