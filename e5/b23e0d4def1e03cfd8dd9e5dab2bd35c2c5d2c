@@ -1,0 +1,37 @@
+.gitignore
+  s_e049c7cc434faa::t_366ccfeb5c2883 558-559
+README.md
+  s_e049c7cc434faa::t_1270c01b7195a7 98-104
+src/common/vietqr/LICENSE-vietqr
+  s_e049c7cc434faa::t_7ff4a5372cb607 1-21
+src/common/vietqr/LICENSE-vietqr-core
+  s_e049c7cc434faa::t_e5b4058464c77f 1-21
+src/common/vietqr/TMVietQR.js
+  s_e049c7cc434faa::t_e3356f80cb8c9d 1-129
+src/common/vietqr/banks.json
+  s_e049c7cc434faa::t_08e7f1be46418e 1-534
+src/i18n/en/i18nCommon.js
+  s_e049c7cc434faa::t_28348d0eeb23fe 207,233-248
+src/i18n/vi/i18nCommon.js
+  s_e049c7cc434faa::t_fca7749485f811 208,234-249
+src/stores/TMToolConfigs.js
+  s_e049c7cc434faa::t_75226280f10c8b 124-130
+src/views/tools/TMVietQR.vue
+  s_e049c7cc434faa::t_0c63c50e5c8713 1-351
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "e5b23e0d4def1e03cfd8dd9e5dab2bd35c2c5d2c",
+  "prompts": {},
+  "sessions": {
+    "s_e049c7cc434faa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "577daec6-9785-4c3c-950a-8b6c7d6e6860",
+        "model": "unknown"
+      },
+      "human_author": "dvanh2 <dvanh2@rd.misa.com.vn>"
+    }
+  }
+}
