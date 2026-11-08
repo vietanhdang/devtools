@@ -1,0 +1,19 @@
+src/views/tools/TMVietQR.vue
+  s_4b1b86156cc9f0::t_906619f20f7a54 278-284
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "743e7e5d07f650ecd4043303e61ecfdfbfd0cf37",
+  "prompts": {},
+  "sessions": {
+    "s_4b1b86156cc9f0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5ce3e6bc-da8f-40cb-afff-db51b9a3291b",
+        "model": "unknown"
+      },
+      "human_author": "dvanh2 <dvanh2@rd.misa.com.vn>"
+    }
+  }
+}
