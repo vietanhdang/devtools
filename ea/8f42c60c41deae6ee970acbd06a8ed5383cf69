@@ -1,0 +1,21 @@
+.gitignore
+  s_4b1b86156cc9f0::t_fcc03b6b771db2 567-569
+scripts/download_vietqr_logos.mjs
+  s_4b1b86156cc9f0::t_8eeeb4b10322d6 7-9,26,54-56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "ea8f42c60c41deae6ee970acbd06a8ed5383cf69",
+  "prompts": {},
+  "sessions": {
+    "s_4b1b86156cc9f0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5ce3e6bc-da8f-40cb-afff-db51b9a3291b",
+        "model": "unknown"
+      },
+      "human_author": "dvanh2 <dvanh2@rd.misa.com.vn>"
+    }
+  }
+}
