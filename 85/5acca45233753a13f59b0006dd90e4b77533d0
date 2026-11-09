@@ -1,0 +1,27 @@
+scripts/download_vietqr_logos.mjs
+  s_4b1b86156cc9f0::t_db78c64d1d57ac 1-94
+src/views/tools/TMVietQR.vue
+  s_4b1b86156cc9f0::t_1199222ca210be 25-29,65-77,95-102,122-123,125-180,251-254,261,283-292,334-352,362-363,369-370,396-409,412,447,450,455-458,473-499,509,513-515,588-590,595,608-613,647-663,732,769-770,780-792
+src/i18n/vi/i18nCommon.js
+  s_4b1b86156cc9f0::t_3c52f5dcee5421 244-245,250-260
+src/common/vietqr/TMVietQrCardRenderer.js
+  s_4b1b86156cc9f0::t_291c1eb45cc6dd 1-686
+src/i18n/en/i18nCommon.js
+  s_4b1b86156cc9f0::t_94735f690cafcc 243-244,249-259
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "855acca45233753a13f59b0006dd90e4b77533d0",
+  "prompts": {},
+  "sessions": {
+    "s_4b1b86156cc9f0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5ce3e6bc-da8f-40cb-afff-db51b9a3291b",
+        "model": "unknown"
+      },
+      "human_author": "dvanh2 <dvanh2@rd.misa.com.vn>"
+    }
+  }
+}
